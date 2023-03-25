@@ -13,7 +13,7 @@ namespace RPG
         {
             InitializeComponent();
 
-            _player = new Player("Player", 100);
+            _player = new Player("Player", 70);
             _player.Inventory.Equip(Item.TwoHanded("Mega Sword", 10));
             _player.Inventory.AddToInventory(Item.OneHanded("Daggeer", 5));
             _player.Inventory.AddToInventory(Item.OneHanded("Daggeer1", 5));

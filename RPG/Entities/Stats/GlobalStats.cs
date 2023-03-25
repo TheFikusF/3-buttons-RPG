@@ -71,8 +71,14 @@ namespace RPG.Entities.Stats
         public GlobalStats() : this(Enum.GetValues(typeof(T)).OfType<T>().Select(x => new Stat(x, "description", 1, 1)).ToList()) { }
 
         public void AddLevel(T name) => _stats.First(x => x.Name.Equals(name)).AddLevel();
+        public void SetLevel(T name, int level) => _stats.First(x => x.Name.Equals(name)).SetLevel(level);
         public Stat GetStat(T name) => _stats.First(x => x.Name.Equals(name));
         public float GetValue(T name) => GetStat(name).Value;
         public float GetFullValue(T name) => _buffs.GetFullValue(name);
+
+        public override string ToString()
+        {
+            return string.Join(Environment.NewLine, _stats.Select(x => $"{x.Name}: {GetFullValue(x.Name)}"));
+        }
     }
 }

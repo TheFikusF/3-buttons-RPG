@@ -1,4 +1,6 @@
-﻿using RPG.Items;
+﻿using System.Linq;
+using RPG.Entities.Stats;
+using RPG.Items;
 using RPG.Utils;
 
 namespace RPG.Entities
@@ -15,14 +17,13 @@ namespace RPG.Entities
         private int _defence;
         private int _attack;
 
-        private float _evasion;
         private float _hitChance;
-        private float _critChance;
         private float _critMultiplier;
 
         private int _money;
 
         private Inventory _inventory;
+        private EntityStats _entitryStats;
 
         public string Name => _name;
         public int Level => _level;
@@ -40,41 +41,40 @@ namespace RPG.Entities
                 _health = _health > MaxHealth ? MaxHealth : _health;
             }
         }
-        public int MaxHealth => _maxHealth + Inventory.Health;
-        public int Defence => _defence + Inventory.Defence;
-        public int Attack => _attack + Inventory.Attack;
+        public int MaxHealth => _maxHealth + Inventory.Health + (int)(Stats.GetFullValue(StatType.Strength) * 3);
+        public int Defence => _defence + Inventory.Defence + (int)(Stats.GetFullValue(StatType.Strength) * 0.2);
+        public int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
         
         public Inventory Inventory => _inventory;
+        public EntityStats Stats => _entitryStats;
 
-        public float Evasion => _evasion; 
+        public float Evasion => MathF.Pow(MathF.Log10(Stats.GetFullValue(StatType.Agility)), 1.666f) * 10; 
         public float HitChance => _hitChance;
-        public float CritChance => _critChance;
+        public float CritChance => MathF.Pow(MathF.Log10(Extensions.Lerp(Stats.GetFullValue(StatType.Agility), Stats.GetFullValue(StatType.Inteligence), 0.7f)), 2.966f) * 10;
         public float CritMultiplier => _critMultiplier;
 
         public Entity(string name, int maxHealth, 
             Inventory inventory, 
+            EntityStats stats,
             int level = 1, 
             int attack = 10, 
-            float evasion = 10, 
-            float hitChance = 90, 
-            float critChance = 10, 
+            float hitChance = 90,  
             float critMultiplier = 2.3f)
         {
             _inventory = inventory;
+            _entitryStats = stats;
             _name = name;
             _level = level;
             
             _maxHealth = maxHealth;
-            _health = maxHealth;
+            _health = MaxHealth;
             
             _experience = 0;
             _money = 0;
             
             _attack = attack;
             
-            _evasion = evasion;
             _hitChance = hitChance;
-            _critChance = critChance;
             _critMultiplier = critMultiplier;
         }
 
@@ -109,7 +109,11 @@ namespace RPG.Entities
                 $"LVL {Level}: {Experience}/{MaxExperience}" + Environment.NewLine + Environment.NewLine +
                 $"Health: {Health}/{MaxHealth}" + Environment.NewLine +
                 $"Defence: {Defence}" + Environment.NewLine +
-                $"Attack: {Attack}" + Environment.NewLine;
+                $"Attack: {Attack}" + Environment.NewLine + Environment.NewLine +
+                Stats + Environment.NewLine + Environment.NewLine +
+                $"Evasion: {Evasion}" + Environment.NewLine +
+                $"Hit chance: {HitChance}" + Environment.NewLine +
+                $"Crit: {CritMultiplier}x for {CritChance}%";
 
             return str;
         }
@@ -117,7 +121,6 @@ namespace RPG.Entities
         public string ToShortString()
         {
             var str = $"|| Entity: {Name}{$"LVL {Level}".PadLeft(23 - Name.Length)}" + Environment.NewLine +
-                //$"LVL {Level}: {Experience}/{MaxExperience}" + Environment.NewLine +
                 $"Health: {Health}/{MaxHealth}";
 
             return str;

@@ -1,4 +1,5 @@
-﻿using RPG.Items;
+﻿using RPG.Entities.Stats;
+using RPG.Items;
 
 namespace RPG.Entities
 {
@@ -7,16 +8,15 @@ namespace RPG.Entities
         public Enemy(string name, 
             int maxHealth, 
             Inventory inventory, 
+            EntityStats stats,
             int level, 
-            int attack = 10, 
-            float evasion = 10, 
+            int attack = 0,  
             float hitChance = 90,
-            float critChance = 10,
             float critMultiplier = 2.3f) : 
-            base(name, maxHealth, inventory, level, attack, evasion, hitChance, critChance, critMultiplier)
+            base(name, maxHealth, inventory, stats, level, attack, hitChance, critMultiplier)
         {
         }
 
-        public static Enemy Slime(int level) => new Enemy("Slime", 20, Inventory.Human(), level, evasion: 20);
+        public static Enemy Slime(int level) => new Enemy("Slime", 20, Inventory.Human(), new EntityStats(10, 0, 10), level, attack: 10);
     }
 }

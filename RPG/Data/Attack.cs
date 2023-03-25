@@ -1,4 +1,6 @@
-﻿using RPG.Entities;
+﻿using RandN.Distributions;
+using RPG.Entities;
+using RPG.Utils;
 
 namespace RPG.Data
 {
@@ -19,14 +21,19 @@ namespace RPG.Data
             Target = target;
 
             Amount = target.Health;
-            Crit = attacker.CritChance > new Random().Next(100);
-            Missed = attacker.HitChance <= new Random().Next(100);
-            Evaded = target.HitChance > new Random().Next(100);
+
+            Crit = Bernoulli.FromRatio((uint)attacker.CritChance, 100).Sample(Extensions.RNG);
+            Missed = !Bernoulli.FromRatio((uint)attacker.HitChance, 100).Sample(Extensions.RNG);
+            Evaded = Bernoulli.FromRatio((uint)target.Evasion, 100).Sample(Extensions.RNG);
 
             int damage = Crit ? (int)(attacker.Attack * attacker.CritMultiplier) : attacker.Attack;
             damage = !Crit && (Missed || Evaded) ? 0 : damage;
 
-            Killed = target.TryTakeDamage(damage);
+            if(!(Missed || Evaded) || Crit)
+            {
+                Killed = target.TryTakeDamage(damage);
+            }
+
             Amount -= target.Health;
         }
 
