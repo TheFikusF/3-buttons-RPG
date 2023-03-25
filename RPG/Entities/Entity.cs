@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using RPG.Entities.Serialization;
 using RPG.Entities.Stats;
 using RPG.Items;
 using RPG.Utils;
@@ -23,7 +23,7 @@ namespace RPG.Entities
         private int _money;
 
         private Inventory _inventory;
-        private EntityStats _entitryStats;
+        private EntityStats _entityStats;
 
         public string Name => _name;
         public int Level => _level;
@@ -46,11 +46,11 @@ namespace RPG.Entities
         public int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
         
         public Inventory Inventory => _inventory;
-        public EntityStats Stats => _entitryStats;
+        public EntityStats Stats => _entityStats;
 
         public float Evasion => MathF.Pow(MathF.Log10(Stats.GetFullValue(StatType.Agility)), 1.666f) * 10; 
         public float HitChance => _hitChance;
-        public float CritChance => MathF.Pow(MathF.Log10(Extensions.Lerp(Stats.GetFullValue(StatType.Agility), Stats.GetFullValue(StatType.Inteligence), 0.7f)), 2.966f) * 10;
+        public float CritChance => MathF.Pow(MathF.Log10(Extensions.Lerp(Stats.GetFullValue(StatType.Agility), Stats.GetFullValue(StatType.Intelligence), 0.7f)), 2.966f) * 10;
         public float CritMultiplier => _critMultiplier;
 
         public Entity(string name, int maxHealth, 
@@ -62,7 +62,7 @@ namespace RPG.Entities
             float critMultiplier = 2.3f)
         {
             _inventory = inventory;
-            _entitryStats = stats;
+            _entityStats = stats;
             _name = name;
             _level = level;
             
@@ -77,6 +77,17 @@ namespace RPG.Entities
             _hitChance = hitChance;
             _critMultiplier = critMultiplier;
         }
+
+        public Entity(SerializedEntity serializedEntity, int level) : 
+            this(serializedEntity.Name, 
+                serializedEntity.MaxHealth, 
+                Inventory.FromSerialized(serializedEntity.InventorySlots), 
+                EntityStats.FromSerialized(serializedEntity.Stats),
+                level,
+                serializedEntity.Attack,
+                serializedEntity.HitChance,
+                serializedEntity.CritMultiplier)
+        { }
 
         public bool AddExperience(int amount)
         {
@@ -111,8 +122,8 @@ namespace RPG.Entities
                 $"Defence: {Defence}" + Environment.NewLine +
                 $"Attack: {Attack}" + Environment.NewLine + Environment.NewLine +
                 Stats + Environment.NewLine + Environment.NewLine +
-                $"Evasion: {Evasion}" + Environment.NewLine +
-                $"Hit chance: {HitChance}" + Environment.NewLine +
+                $"Evasion: {Evasion}%" + Environment.NewLine +
+                $"Hit chance: {HitChance}%" + Environment.NewLine +
                 $"Crit: {CritMultiplier}x for {CritChance}%";
 
             return str;

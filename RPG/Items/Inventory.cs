@@ -1,4 +1,7 @@
-﻿namespace RPG.Items
+﻿using RPG.Entities.Serialization;
+using System.Text.RegularExpressions;
+
+namespace RPG.Items
 {
     public class Inventory
     {
@@ -51,10 +54,16 @@
         public int InventorySize => _inventory.Count;
         public int SlotsCount => _slots.Count;
 
-        private Inventory(List<SlotType> slot)
+        private Inventory(IEnumerable<SlotType> slot)
         {
             _slots = slot.Select(x => new InventorySlot(x)).ToList();
             _inventory = new List<Item>();
+        }
+
+        public static Inventory FromSerialized(Dictionary<string, string> slots)
+        {
+            var newSlots = slots.Where(x => Enum.TryParse(Regex.Replace(x.Key, @"[\d-]", string.Empty), out SlotType type)).Select(x => Enum.Parse<SlotType>(Regex.Replace(x.Key, @"[\d-]", string.Empty)));
+            return new Inventory(newSlots);
         }
 
         public static Inventory Human() =>

@@ -1,4 +1,5 @@
 using RPG.Entities;
+using RPG.Entities.Serialization;
 using RPG.GameStates;
 using RPG.Items;
 
@@ -13,7 +14,9 @@ namespace RPG
         {
             InitializeComponent();
 
-            _player = new Player("Player", 70);
+            EntitiesRepository.InitFromJSON("Entities.json");
+            _player = new Player(SerializedEntity.FromJSON("Player.json"), 1);
+
             _player.Inventory.Equip(Item.TwoHanded("Mega Sword", 10));
             _player.Inventory.AddToInventory(Item.OneHanded("Daggeer", 5));
             _player.Inventory.AddToInventory(Item.OneHanded("Daggeer1", 5));

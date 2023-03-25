@@ -1,4 +1,5 @@
-﻿using RPG.Entities.Stats;
+﻿using RPG.Entities.Serialization;
+using RPG.Entities.Stats;
 using RPG.Items;
 
 namespace RPG.Entities
@@ -9,5 +10,7 @@ namespace RPG.Entities
         {
 
         }
+
+        public Player(SerializedEntity serializedEntity, int level) : base(serializedEntity, level) { }
     }
 }
