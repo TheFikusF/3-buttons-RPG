@@ -1,4 +1,4 @@
-﻿namespace RPG
+﻿/*namespace RPG
 {
     partial class Form1
     {
@@ -104,4 +104,4 @@
         private Button ActionButton3;
         private TextBox MainTextBox;
     }
-}
+}*/

@@ -1,4 +1,5 @@
 ﻿using RPG.Entities;
+using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -16,7 +17,7 @@ namespace RPG.GameStates
             _player = player;
         }
 
-        public abstract void RenderState(TextBox textBox);
+        public abstract void RenderState(TextView textView);
 
         public virtual GameState Button1() { return this; }
         public virtual GameState Button2() { return this; }

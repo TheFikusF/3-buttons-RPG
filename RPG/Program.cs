@@ -1,17 +1,18 @@
+using RPG.GUI;
+using Terminal.Gui;
+
 namespace RPG
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run<GameWindow>();
+
+            //Console.WriteLine($"Username: {((GameWindow)Application.Top).usernameText.Text}");
+
+            // Before the application exits, reset Terminal.Gui for clean shutdown
+            Application.Shutdown();
         }
     }
 }

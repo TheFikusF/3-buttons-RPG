@@ -1,4 +1,5 @@
 ﻿using RPG.Entities;
+using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -13,9 +14,9 @@ namespace RPG.GameStates
             _gold = gold;
         }
 
-        public override void RenderState(TextBox textBox)
+        public override void RenderState(TextView textView)
         {
-            textBox.Text = "";
+            textView.Text = "";
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using RPG.Entities;
+using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -17,9 +18,9 @@ namespace RPG.GameStates
             UpdateButtonText();
         }
 
-        public override void RenderState(TextBox textBox)
+        public override void RenderState(TextView textView)
         {
-            textBox.Text = Player.Inventory.GetString(_index);
+            textView.Text = Player.Inventory.GetString(_index);
         }
 
         public override GameState Button1()

@@ -1,5 +1,6 @@
 ﻿using RPG.Data;
 using RPG.Entities;
+using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -26,9 +27,9 @@ namespace RPG.GameStates
             }
         }
 
-        public override void RenderState(TextBox textBox)
+        public override void RenderState(TextView textView)
         {
-            textBox.Text = "• " + string.Join(Environment.NewLine + "• ", 
+            textView.Text = "• " + string.Join(Environment.NewLine + "• ", 
                 _adventureEvents.Take(_adventureIndex + 1).SelectMany(x => x.ActionDescriptions)) + _adventureEvents[_adventureIndex].RandomNumber;
         }
 

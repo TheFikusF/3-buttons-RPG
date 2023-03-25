@@ -1,5 +1,6 @@
 ﻿using RPG.Data;
 using RPG.Entities;
+using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -15,7 +16,7 @@ namespace RPG.GameStates
             _attacks = new List<Attack>();
         }
 
-        public override void RenderState(TextBox textBox)
+        public override void RenderState(TextView textView)
         {
             _turn++;
             string text = $"Turn #{_turn}" + Environment.NewLine;
@@ -24,7 +25,7 @@ namespace RPG.GameStates
             text += string.Join(Environment.NewLine, _attacks) + Environment.NewLine;
             text += new string('-', 35) + Environment.NewLine;
             text += string.Join(Environment.NewLine, _enemies.Select(x => x.ToShortString()));
-            textBox.Text = text;
+            textView.Text = text;
         }
 
         public override GameState Button1()

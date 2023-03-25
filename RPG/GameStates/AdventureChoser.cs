@@ -1,5 +1,6 @@
 ﻿using RPG.Data;
 using RPG.Entities;
+using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -12,9 +13,9 @@ namespace RPG.GameStates
             Button3Title = "Dungeon";
         }
 
-        public override void RenderState(TextBox textBox)
+        public override void RenderState(TextView textView)
         {
-           textBox.Text = $"Chouse where to go:";
+           textView.Text = $"Chouse where to go:";
         }
 
         public override GameState Button1()
