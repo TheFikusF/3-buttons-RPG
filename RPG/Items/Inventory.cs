@@ -54,7 +54,7 @@ namespace RPG.Items
         public int InventorySize => _inventory.Count;
         public int SlotsCount => _slots.Count;
 
-        private Inventory(IEnumerable<SlotType> slot)
+        public Inventory(IEnumerable<SlotType> slot)
         {
             _slots = slot.Select(x => new InventorySlot(x)).ToList();
             _inventory = new List<Item>();

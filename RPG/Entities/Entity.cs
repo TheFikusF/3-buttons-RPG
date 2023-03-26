@@ -1,6 +1,7 @@
 ﻿using RPG.Entities.Serialization;
 using RPG.Entities.Stats;
 using RPG.Items;
+using RPG.Items.Serialization;
 using RPG.Utils;
 
 namespace RPG.Entities
@@ -81,13 +82,29 @@ namespace RPG.Entities
         public Entity(SerializedEntity serializedEntity, int level) : 
             this(serializedEntity.Name, 
                 serializedEntity.MaxHealth, 
-                Inventory.FromSerialized(serializedEntity.InventorySlots), 
+                new Inventory(serializedEntity.InventorySlots), 
                 EntityStats.FromSerialized(serializedEntity.Stats),
                 level,
                 serializedEntity.Attack,
                 serializedEntity.HitChance,
                 serializedEntity.CritMultiplier)
-        { }
+        { 
+            foreach(string itemName in serializedEntity.EquipedItems)
+            {
+                if(ItemsRepository.TryGetItem(itemName, out Item item))
+                {
+                    Inventory.Equip(new Item(item));
+                }
+            }
+
+            foreach (string itemName in serializedEntity.Inventory)
+            {
+                if (ItemsRepository.TryGetItem(itemName, out Item item))
+                {
+                    Inventory.AddToInventory(new Item(item));
+                }
+            }
+        }
 
         public bool AddExperience(int amount)
         {

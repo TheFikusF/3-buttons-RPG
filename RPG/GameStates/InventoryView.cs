@@ -1,5 +1,4 @@
 ﻿using RPG.Entities;
-using Terminal.Gui;
 
 namespace RPG.GameStates
 {

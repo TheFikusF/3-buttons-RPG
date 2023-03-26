@@ -1,24 +1,37 @@
-﻿namespace RPG.Items
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
+
+namespace RPG.Items
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SlotType
     {
-        Hand, Feet, Legs, Chest, Arms, Head, Accessory
+        [EnumMember(Value = "Hand")] Hand,
+        [EnumMember(Value = "Feet")] Feet,
+        [EnumMember(Value = "Legs")] Legs,
+        [EnumMember(Value = "Chest")] Chest,
+        [EnumMember(Value = "Arms")] Arms,
+        [EnumMember(Value = "Head")] Head,
+        [EnumMember(Value = "Accessory")] Accessory
     }
 
+    [Serializable]
     public class Item
     {
-        private string _name;
-        private int _attack;
-        private int _defence;
-        private int _health;
-        private List<SlotType> _slots;
+        [JsonProperty("Name")] private string _name;
+        [JsonProperty("Attack")] private int _attack;
+        [JsonProperty("Defence")] private int _defence;
+        [JsonProperty("Health")] private int _health;
+        [JsonProperty("InventorySlots")] private List<SlotType> _slots;
 
-        public string Name => _name;
-        public int Attack => _attack;
-        public int Defence => _defence;
-        public int Health => _health;
-        public List<SlotType> Slots => _slots.ToList();
+        [JsonIgnore] public string Name => _name;
+        [JsonIgnore] public int Attack => _attack;
+        [JsonIgnore] public int Defence => _defence;
+        [JsonIgnore] public int Health => _health;
+        [JsonIgnore] public List<SlotType> Slots => _slots.ToList();
 
+        [JsonConstructor]
         private Item(string name, List<SlotType> slots, int attack = 0, int defence = 0, int health = 0) 
         {
             _name = name;
@@ -26,6 +39,15 @@
             _defence = defence;
             _health = health;
             _slots = slots;
+        }
+
+        public Item(Item item)
+        {
+            _name = item.Name;
+            _attack = item.Attack;
+            _defence = item.Defence;
+            _health = item.Health;
+            _slots = item.Slots;
         }
 
         public static Item TwoHanded(string name, int attack = 0, int defence = 0, int health = 0)

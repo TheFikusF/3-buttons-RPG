@@ -1,10 +1,15 @@
-﻿namespace RPG.Entities.Stats
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
+
+namespace RPG.Entities.Stats
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StatType
     {
-        Agility, 
-        Strength, 
-        Intelligence
+        [EnumMember(Value = "Agility")] Agility,
+        [EnumMember(Value = "Strength")] Strength,
+        [EnumMember(Value = "Intelligence")] Intelligence
     }
 
     public class EntityStats : GlobalStats<StatType> 
@@ -16,12 +21,12 @@
             SetLevel(StatType.Intelligence, inteligence);
         }
 
-        public static EntityStats FromSerialized(Dictionary<string, int> stats)
+        public static EntityStats FromSerialized(Dictionary<StatType, int> stats)
         {
-            int agility = stats.DefaultIfEmpty(new KeyValuePair<string, int>("", 10)).FirstOrDefault(x => x.Key.Equals(StatType.Agility.ToString())).Value;
-            int strength = stats.DefaultIfEmpty(new KeyValuePair<string, int>("", 10)).FirstOrDefault(x => x.Key.Equals(StatType.Strength.ToString())).Value;
-            int inteligence = stats.DefaultIfEmpty(new KeyValuePair<string, int>("", 10)).FirstOrDefault(x => x.Key.Equals(StatType.Intelligence.ToString())).Value;
-            
+            stats.TryGetValue(StatType.Agility, out var agility);
+            stats.TryGetValue(StatType.Strength, out var strength);
+            stats.TryGetValue(StatType.Intelligence, out var inteligence);
+
             return new EntityStats(agility, strength, inteligence);
         }
     }
