@@ -12,9 +12,9 @@ namespace RPG.GameStates
             Button3Title = "";
         }
 
-        public override void RenderState(TextView textView)
+        public override string GetStateText()
         {
-            textView.Text = Player.ToString();
+            return Player.ToString();
         }
 
         public override GameState Button1()

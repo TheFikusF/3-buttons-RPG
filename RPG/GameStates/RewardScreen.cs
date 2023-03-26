@@ -14,9 +14,9 @@ namespace RPG.GameStates
             _gold = gold;
         }
 
-        public override void RenderState(TextView textView)
+        public override string GetStateText()
         {
-            textView.Text = "";
+            return "";
         }
     }
 }

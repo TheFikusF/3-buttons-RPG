@@ -17,7 +17,7 @@ namespace RPG.GameStates
             _player = player;
         }
 
-        public abstract void RenderState(TextView textView);
+        public abstract string GetStateText();
 
         public virtual GameState Button1() { return this; }
         public virtual GameState Button2() { return this; }

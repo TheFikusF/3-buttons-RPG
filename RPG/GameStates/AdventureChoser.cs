@@ -13,9 +13,9 @@ namespace RPG.GameStates
             Button3Title = "Dungeon";
         }
 
-        public override void RenderState(TextView textView)
+        public override string GetStateText()
         {
-           textView.Text = $"Chouse where to go:";
+           return $"Chouse where to go:";
         }
 
         public override GameState Button1()

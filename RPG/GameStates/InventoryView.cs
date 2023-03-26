@@ -18,9 +18,9 @@ namespace RPG.GameStates
             UpdateButtonText();
         }
 
-        public override void RenderState(TextView textView)
+        public override string GetStateText()
         {
-            textView.Text = Player.Inventory.GetString(_index);
+            return Player.Inventory.GetString(_index);
         }
 
         public override GameState Button1()

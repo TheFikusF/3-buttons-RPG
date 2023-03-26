@@ -27,9 +27,9 @@ namespace RPG.GameStates
             }
         }
 
-        public override void RenderState(TextView textView)
+        public override string GetStateText()
         {
-            textView.Text = "• " + string.Join(Environment.NewLine + "• ", 
+            return "• " + string.Join(Environment.NewLine + "• ", 
                 _adventureEvents.Take(_adventureIndex + 1).SelectMany(x => x.ActionDescriptions)) + _adventureEvents[_adventureIndex].RandomNumber;
         }
 

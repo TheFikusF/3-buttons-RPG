@@ -16,7 +16,7 @@ namespace RPG.GameStates
             _attacks = new List<Attack>();
         }
 
-        public override void RenderState(TextView textView)
+        public override string GetStateText()
         {
             _turn++;
             string text = $"Turn #{_turn}" + Environment.NewLine;
@@ -25,7 +25,8 @@ namespace RPG.GameStates
             text += string.Join(Environment.NewLine, _attacks) + Environment.NewLine;
             text += new string('-', 35) + Environment.NewLine;
             text += string.Join(Environment.NewLine, _enemies.Select(x => x.ToShortString()));
-            textView.Text = text;
+            
+            return text;
         }
 
         public override GameState Button1()
