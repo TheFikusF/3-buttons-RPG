@@ -30,7 +30,7 @@ namespace RPG.GameStates
         public override string GetStateText()
         {
             return "• " + string.Join(Environment.NewLine + "• ", 
-                _adventureEvents.Take(_adventureIndex + 1).SelectMany(x => x.ActionDescriptions)) + _adventureEvents[_adventureIndex].RandomNumber;
+                _adventureEvents.Take(_adventureIndex + 1).SelectMany(x => x.ActionDescriptions));
         }
 
         public override GameState Button1()
