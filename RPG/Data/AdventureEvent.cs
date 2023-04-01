@@ -13,12 +13,26 @@ namespace RPG.Data
 
     internal class AdventureEvent
     {
-        private static readonly Dictionary<EventType, float> EventChances = new()
+        private struct EventData
         {
-            { EventType.Battle, 50 },
-            { EventType.Chest, 5 },
-            { EventType.Trap, 10 },
-            { EventType.Shrine, 10 },
+            public readonly string ButtonText;
+            public readonly string EventText;
+            public readonly int Chance;
+
+            public EventData(string buttonText, string eventText, int chance)
+            {
+                ButtonText = buttonText;
+                EventText = eventText;
+                Chance = chance;
+            }
+        }
+
+        private static readonly Dictionary<EventType, EventData> EventDataTable = new()
+        {
+            { EventType.Battle, new EventData("FIGHT!", "You've came across your hostile friends.", 50) },
+            { EventType.Chest, new EventData("Open", "You've found a chest!", 5) },
+            { EventType.Trap, new EventData("Continue", "You've traped into a pit with spikes.", 10) },
+            { EventType.Shrine, new EventData("Continue", "You've found a magic shrine that cures your tormented body.", 50) },
         };
 
         private static Dictionary<EventType, float> _summedEventChances;
@@ -31,9 +45,9 @@ namespace RPG.Data
                     _summedEventChances = new();
 
                     float sum = 0;
-                    foreach (var e in EventChances)
+                    foreach (var e in EventDataTable)
                     {
-                        sum += e.Value;
+                        sum += e.Value.Chance;
                         _summedEventChances.Add(e.Key, sum);
                     }
                 }
@@ -45,7 +59,6 @@ namespace RPG.Data
         public static EventType RandomEvent(out float randomNumber)
         {
             randomNumber = (float)(new Random().NextDouble() * SummedEventChances.Last().Value);
-            var previousType = SummedEventChances.First().Key;
 
             foreach (var e in SummedEventChances)
             {
@@ -53,7 +66,6 @@ namespace RPG.Data
                 {
                     return e.Key;
                 }
-                previousType = e.Key;
             }
 
             return EventType.Battle;
@@ -62,11 +74,14 @@ namespace RPG.Data
         public readonly EventType Type;
         public readonly List<string> ActionDescriptions;
         public readonly float RandomNumber;
+        public readonly string ButtonText;
 
         public AdventureEvent()
         {
             Type = RandomEvent(out float number);
             RandomNumber = number;
+            ButtonText = EventDataTable[Type].ButtonText;
+
             ActionDescriptions = new List<string>();
             for(int i = 0; i < new Random().Next(3, 7); i++)
             {
@@ -74,31 +89,28 @@ namespace RPG.Data
             }
         }
 
-        public GameState GetState(Player player, DefaultAdventure currentAdventure)
+        public GameState GetState(Player player, GameState currentState)
         {
+            ActionDescriptions.Add(EventDataTable[Type].EventText);
             GameState Heal()
             {
                 player.Heal(10);
-                ActionDescriptions.Add("Heal");
-                return currentAdventure;
+                return currentState;
             }
 
             GameState Trap()
             {
                 player.TryTakeDamage(10);
-                ActionDescriptions.Add("Trap");
-                return currentAdventure;
+                return currentState;
             }
 
             GameState Fight()
             {
-                ActionDescriptions.Add("Fight!");
                 return new FightScene(player, new List<Enemy>() { Enemy.Slime(1), Enemy.Slime(1) });
             }
 
             GameState Chest()
             {
-                ActionDescriptions.Add("Chest!");
                 return new MainScreen(player);
             }
 
@@ -108,7 +120,7 @@ namespace RPG.Data
                 EventType.Chest => Chest(),
                 EventType.Shrine => Heal(),
                 EventType.Trap => Trap(),
-                _ => currentAdventure,
+                _ => currentState,
             };
         }
     }

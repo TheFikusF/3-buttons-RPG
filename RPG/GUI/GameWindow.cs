@@ -20,20 +20,13 @@ namespace RPG.GUI
 
         public GameWindow()
         {
-            Title = "Example App (Ctrl+Q to quit)";
+            Title = "RPG (Ctrl+Q to quit)";
             InitializeComponents();
 
             ItemsRepository.InitFromJSON("Items.json");
             EntitiesRepository.InitFromJSON("Entities.json");
+
             _player = new Player(SerializedEntity.FromJSON("Player.json"), 1);
-            //_player = new Player("Player", 70);
-
-            //_player.Inventory.Equip(Item.TwoHanded("Mega Sword", 10));
-            //_player.Inventory.Equip(ItemsRepository.Items["Default"].First(x => x.Name == "Zweihander"));
-            //_player.Inventory.AddToInventory(Item.OneHanded("Daggeer", 5));
-            //_player.Inventory.AddToInventory(Item.OneHanded("Daggeer1", 5));
-            //.Inventory.AddToInventory(Item.Head("Helmet", 0, 10));
-
 
             SetCurrentState(new MainScreen(_player));
         }

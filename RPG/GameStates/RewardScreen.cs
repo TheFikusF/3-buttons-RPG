@@ -6,10 +6,12 @@ namespace RPG.GameStates
 {
     internal class RewardScreen : GameState
     {
-        private bool _goldGiven;
-
-        private int _experience;
         private int _gold;
+        private int _experience;
+
+        private bool _goldGiven;
+        private bool _levelUp;
+
         private Queue<Item> _items;
 
         private Item _currentItem;
@@ -18,6 +20,13 @@ namespace RPG.GameStates
         {
             _experience = experience;
             _gold = gold;
+
+            _levelUp = Player.AddExperience(experience);
+            
+            Button1Title = _levelUp ? "Level Up!" : "Continue";
+            
+            Player.AddMoney(gold);
+
             _items = new Queue<Item>(items);
         }
 
@@ -30,36 +39,89 @@ namespace RPG.GameStates
             
             if(_goldGiven)
             {
-                _currentItem = _items.Dequeue();
-
                 builder.Append(_currentItem.GetFullString());
-
-                Button1Title = "Take";
-                Button2Title = "Equip";
-                Button1Title = "Skip";
 
                 return builder.ToString();
             }
 
             builder.Append($"Gold: {_gold}");
-            builder.Append($"Experience: {_experience}");
-            
+            builder.Append(Environment.NewLine);
+            builder.Append($"Experience: {_experience}" + (_levelUp ? " LEVEL UP!" : ""));
+
             return builder.ToString();
         }
 
         public override GameState Button1()
         {
-            return this;
+            var item = _currentItem;
+
+            var nextState = GetNextState();
+
+            if (_levelUp && !_goldGiven)
+            {
+                _goldGiven = true;
+                return new LevelUpScreen(Player, nextState);
+            }
+
+            if (_goldGiven && item != null)
+            {
+                Player.Inventory.AddToInventory(item);
+                return nextState;
+            }
+
+            _goldGiven = true;
+            return nextState;
         }
 
         public override GameState Button2()
         {
-            return this;
+            if(!_goldGiven)
+            {
+                return this;
+            }
+
+            var item = _currentItem;
+
+            var nextState = GetNextState();
+
+            if (_goldGiven && item != null)
+            {
+                Player.Inventory.Equip(item);
+                return nextState;
+            }
+
+            return nextState;
         }
 
         public override GameState Button3()
         {
-            return this;
+            if (!_goldGiven)
+            {
+                return this;
+            }
+
+            var nextState = GetNextState();
+
+            return nextState;
+        }
+
+        private GameState GetNextState()
+        {
+            bool got = _items.TryDequeue(out Item item);
+            if(got)
+            {
+                _currentItem = item;
+                DrawItemButtons();
+            }
+        
+            return got ? this : new MainScreen(Player);
+        }
+
+        private void DrawItemButtons()
+        {
+            Button1Title = "Take";
+            Button2Title = "Equip";
+            Button3Title = "Skip";
         }
     }
 }

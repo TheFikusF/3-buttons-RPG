@@ -1,6 +1,5 @@
 ﻿using RPG.Data;
 using RPG.Entities;
-using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -25,6 +24,7 @@ namespace RPG.GameStates
                     break;
                 }
             }
+            Button1Title = _adventureEvents[_adventureIndex].ButtonText;
         }
 
         public override string GetStateText()
@@ -36,6 +36,7 @@ namespace RPG.GameStates
         public override GameState Button1()
         {
             _adventureIndex++;
+            Button1Title = _adventureEvents[Math.Min(_adventureIndex, _adventureEvents.Count - 1)].ButtonText;
             return _adventureIndex == _adventureEvents.Count ? _adventureFinalState : this;
         }
     }

@@ -1,5 +1,7 @@
 ﻿using RPG.Data;
 using RPG.Entities;
+using RPG.Items;
+using RPG.Items.Serialization;
 using Terminal.Gui;
 
 namespace RPG.GameStates
@@ -34,7 +36,8 @@ namespace RPG.GameStates
             _attacks = new List<Attack>();
             if(!_enemies.Any(x => x.Health > 0))
             {
-                return new MainScreen(Player);
+                ItemsRepository.TryGetItem("Zweihander", out Item item);
+                return new RewardScreen(Player, 50, 50, new List<Item> { item });
             }
 
             _attacks.Add(new Attack(Player, _enemies.First(x => x.Health > 0)));

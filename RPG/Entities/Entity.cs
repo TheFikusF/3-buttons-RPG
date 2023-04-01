@@ -22,6 +22,7 @@ namespace RPG.Entities
         private float _critMultiplier;
 
         private int _money;
+        private int _levelUpPoints;
 
         private Inventory _inventory;
         private EntityStats _entityStats;
@@ -32,6 +33,7 @@ namespace RPG.Entities
         public int MaxExperience => _level * Consts.ExperiencePerLvl;
 
         public int Money => _money;
+        public int LevelUpPoints => _levelUpPoints;
 
         public int Health
         {
@@ -113,11 +115,27 @@ namespace RPG.Entities
             if (_experience >= _level * Consts.ExperiencePerLvl)
             {
                 _level++;
+                _levelUpPoints++;
                 _experience = 0;
                 return true;
             }
 
             return false;
+        }
+
+        public void AddMoney(int amount) => _money += amount;
+
+        public bool TryAddStatLevel(StatType stat)
+        {
+            if(_levelUpPoints <= 0)
+            {
+                return false;
+            }
+
+            _entityStats.AddLevel(stat);
+            _levelUpPoints--;
+
+            return true;
         }
 
         public bool TryTakeDamage(int amount)

@@ -20,7 +20,6 @@ namespace RPG.GameStates
 
         public override GameState Button1()
         {
-            //return new FightScene(Player, new List<Enemy>() { Enemy.Slime(1), Enemy.Slime(1) });
             return new DefaultAdventure(Player);
         }
 
