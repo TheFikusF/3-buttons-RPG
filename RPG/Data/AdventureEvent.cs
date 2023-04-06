@@ -1,5 +1,8 @@
-﻿using RPG.Entities;
+﻿using RandN.Distributions;
+using RPG.Entities;
+using RPG.Entities.Serialization;
 using RPG.GameStates;
+using RPG.Utils;
 
 namespace RPG.Data
 {
@@ -106,7 +109,15 @@ namespace RPG.Data
 
             GameState Fight()
             {
-                return new FightScene(player, new List<Enemy>() { Enemy.Slime(1), Enemy.Slime(1) });
+                uint i = 100;
+                var enemies = new List<Enemy>();
+                while (Bernoulli.FromRatio(i, 100).Sample(Extensions.RNG))
+                {
+                    i = (uint)Math.Round(i * 0.4f);
+                    enemies.Add(new Enemy(EntitiesRepository.Enemies["Default"].PickRandom(), player.Level + new Random().Next(-1, 4)));
+                }
+
+                return new FightScene(player, enemies);
             }
 
             GameState Chest()

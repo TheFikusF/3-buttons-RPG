@@ -52,9 +52,9 @@ namespace RPG.Entities.Stats
             _buffs.Remove(buff);
         }
 
-        public float GetFullValue(T name)
+        public float GetFullValue(T name, int level)
         {
-            var value = _stats.GetValue(name);
+            var value = _stats.GetValue(name, level);
 
             foreach (var buff in _buffs.Where(x => x.Name.Equals(name)))
             {
@@ -67,6 +67,11 @@ namespace RPG.Entities.Stats
             }
 
             return value;
+        }
+
+        public float GetFullValue(T name)
+        {
+            return GetFullValue(name, _stats.GetStat(name).Level);
         }
     }
 }
