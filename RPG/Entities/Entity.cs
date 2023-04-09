@@ -3,6 +3,7 @@ using RPG.Entities.Stats;
 using RPG.Items;
 using RPG.Items.Serialization;
 using RPG.Utils;
+using System.Text;
 
 namespace RPG.Entities
 {
@@ -49,7 +50,7 @@ namespace RPG.Entities
         public int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
         
         public Inventory Inventory => _inventory;
-        public EntityStats Stats => _entityStats;
+        public virtual EntityStats Stats => _entityStats;
 
         public float Evasion => MathF.Pow(MathF.Log10(Stats.GetFullValue(StatType.Agility)), 1.666f) * 10; 
         public float HitChance => _hitChance;
@@ -70,7 +71,7 @@ namespace RPG.Entities
             _level = level;
             
             _maxHealth = maxHealth;
-            _health = MaxHealth;
+            _health = maxHealth;
             
             _experience = 0;
             _money = 0;
@@ -151,17 +152,27 @@ namespace RPG.Entities
 
         public override string ToString()
         {
-            var str = $"|| Entity: {Name}" + Environment.NewLine +
-                $"LVL {Level}: {Experience}/{MaxExperience}" + Environment.NewLine + Environment.NewLine +
-                $"Health: {Health}/{MaxHealth}" + Environment.NewLine +
-                $"Defence: {Defence}" + Environment.NewLine +
-                $"Attack: {Attack}" + Environment.NewLine + Environment.NewLine +
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine($"|| Entity: {Name}");
+            builder.AppendLine($"LVL {Level}: {Experience}/{MaxExperience}{Environment.NewLine}");
+            builder.AppendLine($"Health: {Health}/{MaxHealth}");
+            builder.AppendLine($"Defence: {Defence}");
+            builder.AppendLine($"Attack: {Attack}{Environment.NewLine}");
+            builder.AppendLine($"{Stats}{Environment.NewLine}");
+            builder.AppendLine($"Evasion chance: {Evasion:0.##}%");
+            builder.AppendLine($"Hit chance: {HitChance:0.##}%");
+            builder.AppendLine($"Crit: {CritMultiplier:0.##}x for {CritChance:0.##}%");
+/*            var str =  + Environment.NewLine +
+                 + Environment.NewLine + Environment.NewLine +
+                 + Environment.NewLine +
+                 + Environment.NewLine +
+                 + Environment.NewLine + Environment.NewLine +
                 Stats + Environment.NewLine + Environment.NewLine +
-                $"Evasion: {Evasion}%" + Environment.NewLine +
-                $"Hit chance: {HitChance}%" + Environment.NewLine +
-                $"Crit: {CritMultiplier}x for {CritChance}%";
+                 + Environment.NewLine +
+                 + Environment.NewLine +
+                ;*/
 
-            return str;
+            return builder.ToString();
         }
 
         public string ToShortString()

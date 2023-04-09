@@ -29,5 +29,14 @@ namespace RPG.Entities.Stats
 
             return new EntityStats(agility, strength, inteligence);
         }
+
+        public EntityStats Append(params EntityStats[] stats)
+        {
+            int agility = stats.Sum(x => x.GetStat(StatType.Agility).Level) + GetStat(StatType.Agility).Level;
+            int strength = stats.Sum(x => x.GetStat(StatType.Strength).Level) + GetStat(StatType.Strength).Level;
+            int inteligence = stats.Sum(x => x.GetStat(StatType.Intelligence).Level) + GetStat(StatType.Intelligence).Level;
+            
+            return new EntityStats(agility, strength, inteligence);
+        }
     }
 }

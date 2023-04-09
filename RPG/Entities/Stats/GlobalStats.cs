@@ -9,7 +9,7 @@ namespace RPG.Entities.Stats
         }
 
         [Serializable]
-        public class Stat
+        public struct Stat
         {
             private int _level = 1;
             private string _description = "Upgrades damage";
@@ -36,14 +36,13 @@ namespace RPG.Entities.Stats
                 _increment = increment;
             }
 
-            public void AddLevel()
-            {
-                SetLevel(_level + 1);
-            }
-
-            public void SetLevel(int level)
+            public Stat(Stat stat, int level)
             {
                 _level = level;
+                _description = stat.Description;
+                _incrementType = stat._incrementType;
+                _defaultValue = stat._defaultValue;
+                _increment = stat._increment;
             }
 
             public float GetValue(int level)
@@ -61,6 +60,7 @@ namespace RPG.Entities.Stats
 
         private Dictionary<T, Stat> _stats = new();
         private BuffStats<T> _buffs;
+        private static readonly IEnumerable<T> _defaultStats = Enum.GetValues(typeof(T)).OfType<T>();
 
         public GlobalStats(Dictionary<T, Stat> stats)
         {
@@ -68,10 +68,10 @@ namespace RPG.Entities.Stats
             _buffs = new BuffStats<T>(this);
         }
 
-        public GlobalStats() : this(Enum.GetValues(typeof(T)).OfType<T>().ToDictionary(x => x, x => new Stat("description", 1, 1))) { }
+        public GlobalStats() : this(_defaultStats.ToDictionary(x => x, x => new Stat("description", 1, 1))) { }
 
-        public void AddLevel(T name) => _stats[name].AddLevel();
-        public void SetLevel(T name, int level) => _stats[name].SetLevel(level);
+        public void AddLevel(T name) => _stats[name] = new Stat(_stats[name], _stats[name].Level + 1);
+        public void SetLevel(T name, int level) => _stats[name] = new Stat(_stats[name], level);
         public Stat GetStat(T name) => _stats[name];
         public float GetValue(T name, int level) => GetStat(name).GetValue(level);
         public float GetValue(T name) => GetStat(name).Value;
