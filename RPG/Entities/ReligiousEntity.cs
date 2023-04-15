@@ -9,6 +9,7 @@ namespace RPG.Entities
         private God _god;
         public God God => _god;
 
+        public EntityStats DefaultStats => base.Stats;
         public override EntityStats Stats => God == null ? base.Stats : base.Stats.Append(God.GiftedStats);
 
         public ReligiousEntity(string name, 
@@ -19,7 +20,7 @@ namespace RPG.Entities
             int level = 1, 
             int attack = 10, 
             float hitChance = 90, 
-            float critMultiplier = 2.3F) 
+            float critMultiplier = 2.3f) 
             : base(name, maxHealth, inventory, stats, level, attack, hitChance, critMultiplier)
         {
             _god = god;
@@ -32,9 +33,6 @@ namespace RPG.Entities
             Heal(MaxHealth);
         }
 
-        public override string ToString()
-        {
-            return base.ToString() + Environment.NewLine + $"God: {God.Name}";
-        }
+        public override string ToString() => base.ToString() + Environment.NewLine + $"God: {God.Name}";
     }
 }

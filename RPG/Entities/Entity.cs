@@ -162,15 +162,6 @@ namespace RPG.Entities
             builder.AppendLine($"Evasion chance: {Evasion:0.##}%");
             builder.AppendLine($"Hit chance: {HitChance:0.##}%");
             builder.AppendLine($"Crit: {CritMultiplier:0.##}x for {CritChance:0.##}%");
-/*            var str =  + Environment.NewLine +
-                 + Environment.NewLine + Environment.NewLine +
-                 + Environment.NewLine +
-                 + Environment.NewLine +
-                 + Environment.NewLine + Environment.NewLine +
-                Stats + Environment.NewLine + Environment.NewLine +
-                 + Environment.NewLine +
-                 + Environment.NewLine +
-                ;*/
 
             return builder.ToString();
         }
