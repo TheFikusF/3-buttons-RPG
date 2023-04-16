@@ -1,4 +1,5 @@
-﻿using RPG.Entities.Serialization;
+﻿using RPG.Data;
+using RPG.Entities.Serialization;
 using RPG.Entities.Stats;
 using RPG.Items;
 using RPG.Items.Serialization;
@@ -11,10 +12,10 @@ namespace RPG.Entities
     {
         private string _name;
         private int _level;
-        private int _experience;
 
-        private int _health;
-        private int _maxHealth;
+        private Bar _experience;
+        private Bar _health;
+        private Bar _mana;
 
         private int _defence;
         private int _attack;
@@ -30,22 +31,14 @@ namespace RPG.Entities
 
         public string Name => _name;
         public int Level => _level;
-        public int Experience => _experience;
-        public int MaxExperience => _level * Consts.ExperiencePerLvl;
+        public ReadonlyBar Experience => new ReadonlyBar(_experience);
 
         public int Money => _money;
         public int LevelUpPoints => _levelUpPoints;
 
-        public int Health
-        {
-            get => _health;
-            set
-            {
-                _health = value < 0 ? 0 : value;
-                _health = _health > MaxHealth ? MaxHealth : _health;
-            }
-        }
-        public int MaxHealth => _maxHealth + Inventory.Health + (int)(Stats.GetFullValue(StatType.Strength) * 3);
+        public ReadonlyBar Health => new ReadonlyBar(_health);
+        public ReadonlyBar Mana => new ReadonlyBar(_mana);
+
         public int Defence => _defence + Inventory.Defence + (int)(Stats.GetFullValue(StatType.Strength) * 0.2);
         public int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
         
@@ -69,11 +62,11 @@ namespace RPG.Entities
             _entityStats = stats;
             _name = name;
             _level = level;
+
+            _health = new Bar(0, maxHealth, maxHealth, getMaxValue: (x) => x + Inventory.Health + (int)(Stats.GetFullValue(StatType.Strength) * 3));
+            _mana = new Bar(0, 30, 30, getMaxValue: (x) => x + (int)(Stats.GetFullValue(StatType.Intelligence) * 3));
+            _experience = new Bar(0, 0, Consts.ExperiencePerLvl, getMaxValue: (x) => _level * Consts.ExperiencePerLvl);
             
-            _maxHealth = maxHealth;
-            _health = maxHealth;
-            
-            _experience = 0;
             _money = 0;
             
             _attack = attack;
@@ -111,13 +104,13 @@ namespace RPG.Entities
 
         public bool AddExperience(int amount)
         {
-            _experience += amount;
+            _experience.Value += amount;
 
-            if (_experience >= _level * Consts.ExperiencePerLvl)
+            if (_experience.Value >= _experience.MaxValue)
             {
                 _level++;
                 _levelUpPoints++;
-                _experience = 0;
+                _experience.Value = 0;
                 return true;
             }
 
@@ -141,21 +134,38 @@ namespace RPG.Entities
 
         public bool TryTakeDamage(int amount)
         {
-            Health -= amount - Defence;
-            return Health <= 0;
+            _health.Value -= amount - Defence;
+            return _health.Value <= 0;
         }
 
         public void Heal(int amount)
         {
-            Health += amount;
+            _health.Value += amount;
+        }
+
+        public bool TryTakeMana(int amount)
+        {
+            if(_mana.Value - amount < 0)
+            {
+                return false;
+            }
+
+            _mana.Value -= amount;
+            return true;
+        }
+
+        public void AddMana(int amount)
+        {
+            _mana.Value += amount;
         }
 
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine($"|| Entity: {Name}");
-            builder.AppendLine($"LVL {Level}: {Experience}/{MaxExperience}{Environment.NewLine}");
-            builder.AppendLine($"Health: {Health}/{MaxHealth}");
+            builder.AppendLine($"LVL {Level}: {Experience.Value}/{Experience.MaxValue}{Environment.NewLine}");
+            builder.AppendLine($"Health: {Health.Value}/{Health.MaxValue}");
+            builder.AppendLine($"Mana: {Mana.Value}/{Mana.MaxValue}");
             builder.AppendLine($"Defence: {Defence}");
             builder.AppendLine($"Attack: {Attack}{Environment.NewLine}");
             builder.AppendLine($"{Stats}{Environment.NewLine}");
@@ -169,7 +179,7 @@ namespace RPG.Entities
         public string ToShortString()
         {
             var str = $"|| Entity: {Name}{$"LVL {Level}".PadLeft(23 - Name.Length)}" + Environment.NewLine +
-                $"Health: {Health}/{MaxHealth}";
+                $"Health: {Health.Value}/{Health.MaxValue}";
 
             return str;
         }

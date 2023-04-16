@@ -67,7 +67,10 @@
 
         private void CastSpell(Spell spell, Entity caster, List<Entity> oponents)
         {
-            spell.Action(caster, oponents);
+            if(caster.TryTakeMana(spell.ManaCost))
+            {
+                spell.Action(caster, oponents);
+            }
         }
     }
 }

@@ -24,13 +24,15 @@ namespace RPG.Entities
             : base(name, maxHealth, inventory, stats, level, attack, hitChance, critMultiplier)
         {
             _god = god;
-            Heal(MaxHealth);
+            Heal(Health.MaxValue);
+            AddMana(Mana.MaxValue);
         }
 
         public ReligiousEntity(SerializedEntity serializedEntity, int level) : base(serializedEntity, level) 
         {
             _god = God.Odin;
-            Heal(MaxHealth);
+            Heal(Health.Value);
+            AddMana(Mana.MaxValue);
         }
 
         public override string ToString() => base.ToString() + Environment.NewLine + $"God: {God.Name}";

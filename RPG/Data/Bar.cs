@@ -49,12 +49,12 @@
 
         public Bar(int minValue, int maxValue, int value, Func<int, int> getMinValue = null, Func<int, int> getMaxValue = null)
         {
+            _getMaxValue = getMaxValue is null ? (x) => x : getMaxValue;
+            _getMinValue = getMinValue is null ? (x) => x : getMinValue;
+
             MinValue = minValue;
             MaxValue = maxValue;
             Value = value;
-
-            _getMaxValue = getMaxValue is null ? (x) => x : getMaxValue;
-            _getMinValue = getMinValue is null ? (x) => x : getMinValue;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace RPG.Data
             Attacker = attacker;
             Target = target;
 
-            Amount = target.Health;
+            Amount = target.Health.Value;
 
             Crit = Bernoulli.FromRatio((uint)attacker.CritChance, 100).Sample(Extensions.RNG);
             Missed = !Bernoulli.FromRatio((uint)attacker.HitChance, 100).Sample(Extensions.RNG);
@@ -34,7 +34,7 @@ namespace RPG.Data
                 Killed = target.TryTakeDamage(damage);
             }
 
-            Amount -= target.Health;
+            Amount -= target.Health.Value;
         }
 
 
