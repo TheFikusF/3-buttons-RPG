@@ -16,19 +16,20 @@ namespace RPG.Entities
             int maxHealth, 
             Inventory inventory, 
             EntityStats stats,
+            EntityActions actions,
             God god,
             int level = 1, 
             int attack = 10, 
             float hitChance = 90, 
             float critMultiplier = 2.3f) 
-            : base(name, maxHealth, inventory, stats, level, attack, hitChance, critMultiplier)
+            : base(name, maxHealth, inventory, stats, actions, level, attack, hitChance, critMultiplier)
         {
             _god = god;
             Heal(Health.MaxValue);
             AddMana(Mana.MaxValue);
         }
 
-        public ReligiousEntity(SerializedEntity serializedEntity, int level) : base(serializedEntity, level) 
+        public ReligiousEntity(SerializedEntity serializedEntity, int level) : base(serializedEntity, level, 2) 
         {
             _god = God.Odin;
             Heal(Health.Value);

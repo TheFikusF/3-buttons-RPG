@@ -2,7 +2,6 @@
 using RPG.Entities;
 using RPG.Items;
 using RPG.Items.Serialization;
-using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -34,23 +33,43 @@ namespace RPG.GameStates
         public override GameState Button1()
         {
             _attacks = new List<Attack>();
-            if(!_enemies.Any(x => x.Health.Value > 0))
+            if (!_enemies.Any(x => x.Health.Value > 0))
             {
                 ItemsRepository.TryGetItem("Zweihander", out Item item);
                 return new RewardScreen(Player, 50, 50, new List<Item> { item });
             }
 
             _attacks.Add(new Attack(Player, _enemies.First(x => x.Health.Value > 0)));
-            foreach(Enemy enemy in _enemies)
+            PerformEnemyTurn();
+
+            return this;
+        }
+
+        public override GameState Button2()
+        {
+            _attacks = new List<Attack>();
+            if (!_enemies.Any(x => x.Health.Value > 0))
             {
-                if(enemy.Health.Value <= 0)
+                ItemsRepository.TryGetItem("Zweihander", out Item item);
+                return new RewardScreen(Player, 50, 50, new List<Item> { item });
+            }
+
+            _attacks.Add(new Attack(Player, _enemies.First(x => x.Health.Value > 0)));
+            PerformEnemyTurn();
+
+            return this;
+        }
+
+        private void PerformEnemyTurn()
+        {
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy.Health.Value <= 0)
                 {
                     continue;
                 }
                 _attacks.Add(new Attack(enemy, Player));
             }
-
-            return this;
         }
     }
 }

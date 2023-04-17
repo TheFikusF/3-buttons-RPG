@@ -28,6 +28,7 @@ namespace RPG.Entities
 
         private Inventory _inventory;
         private EntityStats _entityStats;
+        private EntityActions _entityActions;
 
         public string Name => _name;
         public int Level => _level;
@@ -44,6 +45,7 @@ namespace RPG.Entities
         
         public Inventory Inventory => _inventory;
         public virtual EntityStats Stats => _entityStats;
+        public virtual EntityActions Actions => _entityActions;
 
         public float Evasion => MathF.Pow(MathF.Log10(Stats.GetFullValue(StatType.Agility)), 1.666f) * 10; 
         public float HitChance => _hitChance;
@@ -53,6 +55,7 @@ namespace RPG.Entities
         public Entity(string name, int maxHealth, 
             Inventory inventory, 
             EntityStats stats,
+            EntityActions actions,
             int level = 1, 
             int attack = 10, 
             float hitChance = 90,  
@@ -60,6 +63,8 @@ namespace RPG.Entities
         {
             _inventory = inventory;
             _entityStats = stats;
+            _entityActions = actions;
+
             _name = name;
             _level = level;
 
@@ -75,11 +80,12 @@ namespace RPG.Entities
             _critMultiplier = critMultiplier;
         }
 
-        public Entity(SerializedEntity serializedEntity, int level) : 
+        public Entity(SerializedEntity serializedEntity, int level, int actionsSlots = 1) : 
             this(serializedEntity.Name, 
                 serializedEntity.MaxHealth, 
                 new Inventory(serializedEntity.InventorySlots), 
                 EntityStats.FromSerialized(serializedEntity.Stats),
+                new EntityActions(actionsSlots),
                 level,
                 serializedEntity.Attack,
                 serializedEntity.HitChance,
@@ -158,6 +164,8 @@ namespace RPG.Entities
         {
             _mana.Value += amount;
         }
+
+        public void CastSpell(int slot, List<Entity> entities) => _entityActions.CastSpell(slot, this, entities);
 
         public override string ToString()
         {

@@ -10,17 +10,18 @@ namespace RPG.Entities
             int maxHealth, 
             Inventory inventory, 
             EntityStats stats,
+            EntityActions actions,
             God god,
             int level, 
             int attack = 0,  
             float hitChance = 90,
             float critMultiplier = 2.3f) : 
-            base(name, maxHealth, inventory, stats, god, level, attack, hitChance, critMultiplier)
+            base(name, maxHealth, inventory, stats, actions, god, level, attack, hitChance, critMultiplier)
         {
         }
 
         public Enemy(SerializedEntity serializedEntity, int level) : base(serializedEntity, level) { }
 
-        public static Enemy Slime(int level) => new Enemy("Slime", 20, Inventory.Human(), new EntityStats(10, 0, 10), God.Odin, level, attack: 10);
+        public static Enemy Slime(int level) => new Enemy("Slime", 20, Inventory.Human(), new EntityStats(10, 0, 10), new EntityActions(2), God.Odin, level, attack: 10);
     }
 }

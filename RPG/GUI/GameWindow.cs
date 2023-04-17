@@ -27,6 +27,7 @@ namespace RPG.GUI
             EntitiesRepository.InitFromJSON("Entities.json");
 
             _player = new Player(SerializedEntity.FromJSON("Player.json"), 1);
+            _player.Actions.EquipSpell(EntityActions.Spell.Cleave(), 0);
 
             SetCurrentState(new MainScreen(_player));
         }

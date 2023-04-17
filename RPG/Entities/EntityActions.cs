@@ -1,22 +1,34 @@
-﻿namespace RPG.Entities
+﻿using RPG.Data;
+
+namespace RPG.Entities
 {
-    internal class EntityActions
+    public class EntityActions
     {
         public class Spell
         {
             public readonly string Name;
             public readonly string Description;
             
-            public readonly Action<Entity, List<Entity>> Action;
+            public readonly Func<Entity, List<Entity>, string> Action;
             public readonly int ManaCost;
 
-            public Spell(string name, string description, Action<Entity, List<Entity>> action, int manaCost)
+            public Spell(string name, string description, Func<Entity, List<Entity>, string> action, int manaCost)
             {
                 Name = name;
                 Description = description;
                 Action = action;
                 ManaCost = manaCost;
             }
+
+            public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack", (caster, opponents) =>
+            {
+                foreach(var oppnent in opponents)
+                {
+                    var currentAttack = new Attack(caster, oppnent, 0.4f);
+                }
+
+                return "cleave";
+            }, 10);
 
             public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}{Environment.NewLine}|: {Description}";
 

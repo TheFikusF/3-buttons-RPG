@@ -14,7 +14,7 @@ namespace RPG.Data
         public readonly bool Evaded;
         public readonly bool Crit;
 
-        public Attack(Entity attacker, Entity target)
+        public Attack(Entity attacker, Entity target, float multiplier = 1)
         {
 
             Attacker = attacker;
@@ -31,7 +31,7 @@ namespace RPG.Data
 
             if(!(Missed || Evaded) || Crit)
             {
-                Killed = target.TryTakeDamage(damage);
+                Killed = target.TryTakeDamage((int)(damage * multiplier));
             }
 
             Amount -= target.Health.Value;
