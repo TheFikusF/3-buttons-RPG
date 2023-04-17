@@ -4,15 +4,20 @@ namespace RPG.Entities
 {
     public class EntityActions
     {
+        public enum SpellResultType
+        {
+            Ok, NotEnoughMana,
+        }
+
         public class Spell
         {
             public readonly string Name;
             public readonly string Description;
             
-            public readonly Func<Entity, List<Entity>, string> Action;
+            public readonly Func<Entity, List<Entity>, SpellResult> Action;
             public readonly int ManaCost;
 
-            public Spell(string name, string description, Func<Entity, List<Entity>, string> action, int manaCost)
+            public Spell(string name, string description, Func<Entity, List<Entity>, SpellResult> action, int manaCost)
             {
                 Name = name;
                 Description = description;
@@ -22,17 +27,32 @@ namespace RPG.Entities
 
             public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack", (caster, opponents) =>
             {
+                List<Attack> attacks = new List<Attack>();
                 foreach(var oppnent in opponents)
                 {
-                    var currentAttack = new Attack(caster, oppnent, 0.4f);
+                    attacks.Add(new Attack(caster, oppnent, 0.4f));
                 }
 
-                return "cleave";
+                return new SpellResult($"{caster.Name} cleaved {string.Join(", ",attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})" ))}.", SpellResultType.Ok);
             }, 10);
 
             public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}{Environment.NewLine}|: {Description}";
 
             public string ShortToString() => $"{Name}";
+        }
+
+        public struct SpellResult
+        {
+            public readonly string Description;
+            public readonly SpellResultType ResultType;
+
+            public SpellResult(string description, SpellResultType resultType)
+            {
+                Description = description;
+                ResultType = resultType;
+            }
+
+            public override string ToString() => Description;
         }
 
         private Spell[] _spellSlots;
@@ -75,14 +95,16 @@ namespace RPG.Entities
             _spellSlots[slotIndex] = spell;
         }
 
-        public void CastSpell(int slotIndex, Entity caster, List<Entity> oponents) => CastSpell(_spellSlots[slotIndex], caster, oponents);
+        public SpellResult CastSpell(int slotIndex, Entity caster, List<Entity> oponents) => CastSpell(_spellSlots[slotIndex], caster, oponents);
 
-        private void CastSpell(Spell spell, Entity caster, List<Entity> oponents)
+        private SpellResult CastSpell(Spell spell, Entity caster, List<Entity> oponents)
         {
             if(caster.TryTakeMana(spell.ManaCost))
             {
-                spell.Action(caster, oponents);
+                return spell.Action(caster, oponents);
             }
+
+            return new SpellResult($"Not enough mana for {spell.Name}!", SpellResultType.NotEnoughMana);
         }
     }
 }

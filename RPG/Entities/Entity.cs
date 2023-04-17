@@ -43,7 +43,7 @@ namespace RPG.Entities
         public int Defence => _defence + Inventory.Defence + (int)(Stats.GetFullValue(StatType.Strength) * 0.2);
         public int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
         
-        public Inventory Inventory => _inventory;
+        public virtual Inventory Inventory => _inventory;
         public virtual EntityStats Stats => _entityStats;
         public virtual EntityActions Actions => _entityActions;
 
@@ -165,7 +165,7 @@ namespace RPG.Entities
             _mana.Value += amount;
         }
 
-        public void CastSpell(int slot, List<Entity> entities) => _entityActions.CastSpell(slot, this, entities);
+        public EntityActions.SpellResult CastSpell(int slot, List<Entity> entities) => _entityActions.CastSpell(slot, this, entities);
 
         public override string ToString()
         {
