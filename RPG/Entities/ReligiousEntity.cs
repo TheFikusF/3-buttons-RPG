@@ -24,18 +24,24 @@ namespace RPG.Entities
             float critMultiplier = 2.3f) 
             : base(name, maxHealth, inventory, stats, actions, level, attack, hitChance, critMultiplier)
         {
-            _god = god;
+            SetGod(god);
             Heal(Health.MaxValue);
             AddMana(Mana.MaxValue);
         }
 
         public ReligiousEntity(SerializedEntity serializedEntity, int level) : base(serializedEntity, level, 2) 
         {
-            _god = God.Odin;
+            SetGod(God.Odin);
             Heal(Health.Value);
             AddMana(Mana.MaxValue);
         }
 
         public override string ToString() => base.ToString() + Environment.NewLine + $"God: {God.Name}";
+
+        public void SetGod(God god)
+        {
+            _god = god;
+            Actions.EquipSpell(god.GiftedSpell, 1);
+        }
     }
 }

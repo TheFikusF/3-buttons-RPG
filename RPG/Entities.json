@@ -1,0 +1,86 @@
+{
+    "Enemies":
+    {
+        "Default":
+        [
+            {
+                "Name":"Slime",
+                "MaxHealth":20,
+                "InventorySlots":
+                [
+                    "Head",
+                    "Accessory",
+                    "Accessory",
+                    "Accessory"
+                ],
+                "Stats":
+                {
+                    "Agility":10, 
+                    "Strength":0, 
+                    "Intelligence":10
+                },
+                "Attack": 10,
+                "HitChance": 90,
+                "CritMultiplier": 2.3,
+                "EquipedItems": [],
+                "Inventory": []
+            },
+            {
+                "Name":"Ogre",
+                "MaxHealth":20,
+                "InventorySlots":
+                [
+                    "Hand",
+                    "Hand",
+                    "Head",
+                    "Chest",
+                    "Arms",
+                    "Legs",
+                    "Feet",
+                    "Accessory",
+                    "Accessory",
+                    "Accessory"
+                ],
+                "Stats":
+                {
+                    "Agility":10, 
+                    "Strength":10, 
+                    "Intelligence":5
+                },
+                "Attack": 0,
+                "HitChance": 90,
+                "CritMultiplier": 2.3,
+                "EquipedItems": [],
+                "Inventory": []
+            },
+            {
+                "Name":"Skeleton",
+                "MaxHealth":20,
+                "InventorySlots":
+                [
+                    "Hand",
+                    "Hand",
+                    "Head",
+                    "Chest",
+                    "Arms",
+                    "Legs",
+                    "Feet",
+                    "Accessory",
+                    "Accessory",
+                    "Accessory"
+                ],
+                "Stats":
+                {
+                    "Agility":10, 
+                    "Strength":5, 
+                    "Intelligence":10
+                },
+                "Attack": 10,
+                "HitChance": 90,
+                "CritMultiplier": 2.3,
+                "EquipedItems": [],
+                "Inventory": []
+            }
+        ]
+    }
+}

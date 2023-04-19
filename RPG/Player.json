@@ -1,0 +1,35 @@
+{
+    "Name":"Player",
+    "MaxHealth":70,
+    "InventorySlots":
+    [
+        "Hand",
+        "Hand",
+        "Head",
+        "Chest",
+        "Arms",
+        "Legs",
+        "Feet",
+        "Accessory",
+        "Accessory",
+        "Accessory"
+    ],
+    "Stats":
+    {
+        "Agility":10, 
+        "Strength":10, 
+        "Intelligence":10
+    },
+    "Attack": 0,
+    "HitChance": 90,
+    "CritMultiplier": 2.3,
+    "EquipedItems": 
+    [
+        "Zweihander"
+    ],
+    "Inventory": 
+    [
+        "Dagger",
+        "Dagger"
+    ]
+}

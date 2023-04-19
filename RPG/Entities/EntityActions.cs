@@ -25,7 +25,7 @@ namespace RPG.Entities
                 ManaCost = manaCost;
             }
 
-            public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack", (caster, opponents) =>
+            public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack.", (caster, opponents) =>
             {
                 List<Attack> attacks = new List<Attack>();
                 foreach(var oppnent in opponents)
@@ -35,6 +35,17 @@ namespace RPG.Entities
 
                 return new SpellResult($"{caster.Name} cleaved {string.Join(", ",attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})" ))}.", SpellResultType.Ok);
             }, 10);
+
+            public static Spell ThunderStike() => new Spell("ThunderStike", "You strike enemies from the sky.", (caster, opponents) =>
+            {
+                List<Attack> attacks = new List<Attack>();
+                foreach (var oppnent in opponents)
+                {
+                    attacks.Add(new Attack(caster, oppnent, 1.4f));
+                }
+
+                return new SpellResult($"{caster.Name} struck {string.Join(", ", attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})"))}.", SpellResultType.Ok);
+            }, 25);
 
             public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}{Environment.NewLine}|: {Description}";
 
@@ -63,10 +74,10 @@ namespace RPG.Entities
         public List<Spell> EquipedSpells => _spellSlots.ToList();
         public List<(Spell, bool)> Spells => _spells.Select(x => x.Value).ToList();
 
-        public EntityActions(int maxSpells, Dictionary<string, (Spell, bool)> availableSpells = null) 
+        public EntityActions(int maxSpells, List<Spell> availableSpells = null) 
         {
             _spellSlots = new Spell[maxSpells];
-            _spells = availableSpells ?? new Dictionary<string, (Spell, bool)>();
+            _spells = availableSpells is null ? new Dictionary<string, (Spell, bool)>() : availableSpells.ToDictionary(x => x.Name, x => (x, false));
         }
 
         public void AddSpell(Spell spell) => _spells[spell.Name] = (spell, false);
