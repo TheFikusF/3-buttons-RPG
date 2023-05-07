@@ -37,7 +37,7 @@ namespace RPG.Items
             get
             {
                 var item = _slots.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == key);
-                if(item == null)
+                if (item == null)
                 {
                     return null;
                 }
@@ -66,15 +66,17 @@ namespace RPG.Items
             return new Inventory(newSlots);
         }
 
-        public static Inventory Human() =>
-            new Inventory(new List<SlotType>() { SlotType.Hand, SlotType.Hand,
+        public static Inventory Human() => new Inventory(HumanSlots());
+
+        public static List<SlotType> HumanSlots() =>
+            new List<SlotType>() { SlotType.Hand, SlotType.Hand,
                 SlotType.Head,
                 SlotType.Chest,
                 SlotType.Arms,
                 SlotType.Legs,
                 SlotType.Feet,
-                SlotType.Accessory, SlotType.Accessory, SlotType.Accessory });
-    
+                SlotType.Accessory, SlotType.Accessory, SlotType.Accessory };
+
         public void AddToInventory(Item item)
         {
             _inventory.Add(item);
@@ -91,7 +93,7 @@ namespace RPG.Items
         {
             foreach (var slotType in item.Slots)
             {
-                if(_slots.Count(x => x.Type == slotType) < item.Slots.Count(x => x == slotType))
+                if (_slots.Count(x => x.Type == slotType) < item.Slots.Count(x => x == slotType))
                 {
                     return;
                 }
@@ -101,7 +103,7 @@ namespace RPG.Items
             foreach (var slotType in item.Slots)
             {
                 var suitable = _slots.Except(equiped).Where(x => x.Type == slotType);
-                if(suitable.Any(x => x.Item is null))
+                if (suitable.Any(x => x.Item is null))
                 {
                     EquipItem(item, equiped, suitable);
                     continue;
@@ -120,13 +122,13 @@ namespace RPG.Items
             void EquipItem(Item item, List<InventorySlot> equiped, IEnumerable<InventorySlot> suitable)
             {
                 InventorySlot slot = suitable.First(x => x.Item == null);
-                
+
                 Item unequipedItem = slot.Unequip();
                 if (unequipedItem is not null)
                 {
                     _inventory.Add(unequipedItem);
                 }
-                
+
                 slot.Equip(item);
                 equiped.Add(slot);
             }
@@ -136,7 +138,7 @@ namespace RPG.Items
 
         public void Unequip(Item item)
         {
-            if(item is null)
+            if (item is null)
             {
                 return;
             }
@@ -155,23 +157,23 @@ namespace RPG.Items
             {
                 string str = $"{item.Type.ToString().PadLeft(12)}|";
 
-                if(index == selected)
+                if (index == selected)
                 {
                     str += ">";
                 }
 
-                if(item.Item is null)
+                if (item.Item is null)
                 {
                     str += " Empty";
                     return str;
                 }
 
-                if(index == selected)
+                if (index == selected)
                 {
                     str += $" {item.Item.GetFullString(10)}";
                 }
 
-                if(index != selected) 
+                if (index != selected)
                 {
                     str += $" {item.Item}";
                 }
@@ -182,7 +184,7 @@ namespace RPG.Items
             return $"Equiped: " + Environment.NewLine +
                 string.Join("", _slots.Select((value, index) => GetItemString(value, index) + Environment.NewLine)) +
                 $"Inventory: " + Environment.NewLine +
-                string.Join("", _inventory.Select((value, index) => index == selected - _slots.Count ? 
+                string.Join("", _inventory.Select((value, index) => index == selected - _slots.Count ?
                 $"|> {value.GetFullString()}" : $"| {value}" + Environment.NewLine));
         }
     }

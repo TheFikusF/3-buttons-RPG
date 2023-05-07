@@ -31,12 +31,12 @@ namespace RPG.Entities
 
         public ReligiousEntity(SerializedEntity serializedEntity, int level) : base(serializedEntity, level, 2) 
         {
-            SetGod(God.Odin);
+            SetGod(EntitiesRepository.Gods[0]);
             Heal(Health.Value);
             AddMana(Mana.MaxValue);
         }
 
-        public override string ToString() => base.ToString() + Environment.NewLine + $"God: {God.Name}";
+        public override string ToString() => base.ToString() + Environment.NewLine + "God: " + (God is null ? "none" : $"{God.Name}");
 
         public void SetGod(God god)
         {

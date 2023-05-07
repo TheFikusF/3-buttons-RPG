@@ -17,10 +17,7 @@ namespace RPG.Entities.Serialization
         public List<string> EquipedItems;
         public List<string> Inventory;
 
-        public SerializedEntity()
-        {
-
-        }
+        public SerializedEntity() { }
 
         [JsonConstructor]
         public SerializedEntity(string name, 
@@ -45,30 +42,5 @@ namespace RPG.Entities.Serialization
         }
 
         public static SerializedEntity FromJSON(string path) => JsonConvert.DeserializeObject<SerializedEntity>(File.ReadAllText(path));
-    }
-
-    [Serializable]
-    public class EntitiesRepository
-    {
-        [JsonIgnore] private static EntitiesRepository _instance;
-        
-        [JsonProperty("Enemies")] private Dictionary<string, List<SerializedEntity>> _enemies;
-        [JsonIgnore] public static Dictionary<string, List<SerializedEntity>> Enemies => _instance._enemies.ToDictionary(x => x.Key, x => x.Value);
-
-        public EntitiesRepository()
-        {
-
-        }
-
-        [JsonConstructor]
-        public EntitiesRepository(Dictionary<string, List<SerializedEntity>> enemies)
-        {
-            _enemies = enemies;
-        }
-
-        public static void InitFromJSON(string path)
-        {
-            _instance = JsonConvert.DeserializeObject<EntitiesRepository>(File.ReadAllText(path));
-        }
     }
 }

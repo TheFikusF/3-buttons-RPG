@@ -57,7 +57,7 @@ namespace RPG.Data
 
             if (Missed)
             {
-                return $"{Target.Name} missed the attack on {Attacker.Name}.";
+                return $"{Attacker.Name} missed the attack on {Target.Name}.";
             }
 
             return $"{Attacker.Name} attacked {Target.Name} for {Amount} HP.";

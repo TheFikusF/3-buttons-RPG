@@ -16,6 +16,16 @@ namespace RPG.Items
         [EnumMember(Value = "Accessory")] Accessory
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ItemRarity
+    {
+        [EnumMember(Value = "Common")] Common,
+        [EnumMember(Value = "Uncommon")] Uncommon,
+        [EnumMember(Value = "Rare")] Rare,
+        [EnumMember(Value = "Epic")] Epic,
+        [EnumMember(Value = "Legendary")] Legendary,
+    }
+
     [Serializable]
     public class Item
     {

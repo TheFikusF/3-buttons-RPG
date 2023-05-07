@@ -3,6 +3,7 @@ using RPG.Entities;
 using RPG.Entities.Serialization;
 using RPG.GameStates;
 using Terminal.Gui;
+using RPG.Data.DataProviders;
 
 namespace RPG.GUI
 {
@@ -24,7 +25,8 @@ namespace RPG.GUI
             InitializeComponents();
 
             ItemsRepository.InitFromJSON("Items.json");
-            EntitiesRepository.InitFromJSON("Entities.json");
+            //new EntitiesRepository(JSONEntityProvider.InitFromJSON("Entities.json"));
+            new EntitiesRepository(new EntityDataProvider());
 
             _player = new Player(SerializedEntity.FromJSON("Player.json"), 1);
             _player.Actions.EquipSpell(EntityActions.Spell.Cleave(), 0);

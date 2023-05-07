@@ -20,8 +20,12 @@ namespace RPG.Entities
         {
         }
 
-        public Enemy(SerializedEntity serializedEntity, int level) : base(serializedEntity, level) { }
+        public Enemy(SerializedEntity serializedEntity, int level) : base(serializedEntity, level) 
+        {
+            Heal(Health.MaxValue);
+            AddMana(Mana.MaxValue);
+        }
 
-        public static Enemy Slime(int level) => new Enemy("Slime", 20, Inventory.Human(), new EntityStats(10, 0, 10), new EntityActions(2), God.Odin, level, attack: 10);
+        public static Enemy Slime(int level) => new Enemy("Slime", 20, Inventory.Human(), new EntityStats(10, 0, 10), new EntityActions(2), EntitiesRepository.Gods[0], level, attack: 10);
     }
 }
