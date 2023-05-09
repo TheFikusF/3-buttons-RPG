@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RPG.Entities;
 using RPG.Entities.Serialization;
 
 namespace RPG.Data.DataProviders

@@ -133,6 +133,8 @@ namespace RPG.Entities
             }
 
             _entityStats.AddLevel(stat);
+            Heal(Health.MaxValue);
+            AddMana(Mana.MaxValue);
             _levelUpPoints--;
 
             return true;

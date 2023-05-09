@@ -60,7 +60,7 @@ namespace RPG.Entities.Stats
 
         private Dictionary<T, Stat> _stats = new();
         private BuffStats<T> _buffs;
-        private static readonly IEnumerable<T> _defaultStats = Enum.GetValues(typeof(T)).OfType<T>();
+        public static readonly IEnumerable<T> DefaultStats = Enum.GetValues(typeof(T)).OfType<T>();
 
         public GlobalStats(Dictionary<T, Stat> stats)
         {
@@ -68,7 +68,7 @@ namespace RPG.Entities.Stats
             _buffs = new BuffStats<T>(this);
         }
 
-        public GlobalStats() : this(_defaultStats.ToDictionary(x => x, x => new Stat("description", 1, 1))) { }
+        public GlobalStats() : this(DefaultStats.ToDictionary(x => x, x => new Stat("description", 1, 1))) { }
 
         public void AddLevel(T name) => _stats[name] = new Stat(_stats[name], _stats[name].Level + 1);
         public void SetLevel(T name, int level) => _stats[name] = new Stat(_stats[name], level);
