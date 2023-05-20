@@ -19,6 +19,8 @@ namespace RPG.GameStates
 
         public abstract string GetStateText();
 
+        public virtual void ButtonPressStart() { }
+
         public virtual GameState Button1() { return this; }
         public virtual GameState Button2() { return this; }
         public virtual GameState Button3() { return this; }

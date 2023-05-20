@@ -4,7 +4,7 @@ using RPG.Items;
 
 namespace RPG.Entities
 {
-    public class ReligiousEntity : Entity
+    public class ReligiousEntity : EffectedEntity
     {
         private God _god;
         public God God => _god;

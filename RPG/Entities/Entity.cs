@@ -30,6 +30,8 @@ namespace RPG.Entities
         private EntityStats _entityStats;
         private EntityActions _entityActions;
 
+        private int _lastDamageTook;
+
         public string Name => _name;
         public int Level => _level;
         public ReadonlyBar Experience => new ReadonlyBar(_experience);
@@ -41,7 +43,7 @@ namespace RPG.Entities
         public ReadonlyBar Mana => new ReadonlyBar(_mana);
 
         public int Defence => _defence + Inventory.Defence + (int)(Stats.GetFullValue(StatType.Strength) * 0.2);
-        public int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
+        public virtual int Attack => _attack + Inventory.Attack + (int)Stats.GetFullValue(StatType.Strength);
         
         public virtual Inventory Inventory => _inventory;
         public virtual EntityStats Stats => _entityStats;
@@ -51,6 +53,8 @@ namespace RPG.Entities
         public float HitChance => _hitChance;
         public float CritChance => MathF.Pow(MathF.Log10(Extensions.Lerp(Stats.GetFullValue(StatType.Agility), Stats.GetFullValue(StatType.Intelligence), 0.7f)), 2.966f) * 10;
         public float CritMultiplier => _critMultiplier;
+
+        public int LastDamageTook => _lastDamageTook;
 
         public Entity(string name, int maxHealth, 
             Inventory inventory, 
@@ -70,7 +74,7 @@ namespace RPG.Entities
 
             _health = new Bar(0, maxHealth, maxHealth, getMaxValue: (x) => x + Inventory.Health + (int)(Stats.GetFullValue(StatType.Strength) * 3));
             _mana = new Bar(0, 30, 30, getMaxValue: (x) => x + (int)(Stats.GetFullValue(StatType.Intelligence) * 3));
-            _experience = new Bar(0, 0, Consts.ExperiencePerLvl, getMaxValue: (x) => _level * Consts.ExperiencePerLvl);
+            _experience = new Bar(0, Consts.ExperiencePerLvl, 0, getMaxValue: (x) => _level * Consts.ExperiencePerLvl);
             
             _money = 0;
             
@@ -78,6 +82,10 @@ namespace RPG.Entities
             
             _hitChance = hitChance;
             _critMultiplier = critMultiplier;
+
+            _lastDamageTook = 0;
+
+            AllocatePoints();
         }
 
         public Entity(SerializedEntity serializedEntity, int level, int actionsSlots = 1) : 
@@ -140,13 +148,16 @@ namespace RPG.Entities
             return true;
         }
 
-        public bool TryTakeDamage(int amount)
+        public virtual bool TryTakeDamage(int amount)
         {
+            var initialHealth = _health.Value;
             _health.Value -= amount - Defence;
+            _lastDamageTook = initialHealth - _health.Value;
+
             return _health.Value <= 0;
         }
 
-        public void Heal(int amount)
+        public virtual void Heal(int amount)
         {
             _health.Value += amount;
         }
@@ -192,6 +203,36 @@ namespace RPG.Entities
                 $"Health: {Health.Value}/{Health.MaxValue}";
 
             return str;
+        }
+
+        private void AllocatePoints()
+        {
+            List<StatType> currentStats = EntityStats.DefaultStats.ToList();
+            int total = currentStats.Sum(x => (int)Stats.GetValue(x));
+            
+            Random rand = new Random();
+            for (int i = 0; i < Level - 1; i++)
+            {
+                int roll = rand.Next(1, total + 1);
+
+                AllocatePoint(currentStats, roll);
+                total++;
+            }
+        }
+
+        private void AllocatePoint(List<StatType> currentStats, int roll)
+        {
+            for (int j = 0; j < currentStats.Count; j++)
+            {
+                int statValue = (int)Stats.GetValue(currentStats[j]);
+                if (roll <= statValue)
+                {
+                    Stats.AddLevel(currentStats[j]);
+                    break;
+                }
+
+                roll -= statValue;
+            }
         }
     }
 }

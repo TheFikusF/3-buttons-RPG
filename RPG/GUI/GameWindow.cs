@@ -86,20 +86,22 @@ namespace RPG.GUI
 
             _button1.Clicked += () =>
             {
+                _currentState.ButtonPressStart();
                 SetCurrentState(_currentState.Button1());
             };
 
             _button2.Clicked += () =>
             {
+                _currentState.ButtonPressStart();
                 SetCurrentState(_currentState.Button2());
             };
 
             _button3.Clicked += () =>
             {
+                _currentState.ButtonPressStart();
                 SetCurrentState(_currentState.Button3());
             };
 
-            // Add the views to the Window
             Add(_frameView, _button1, _button2, _button3);
         }
 

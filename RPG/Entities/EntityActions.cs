@@ -39,9 +39,9 @@ namespace RPG.Entities
             public static Spell ThunderStike() => new Spell("ThunderStike", "You strike enemies from the sky.", (caster, opponents) =>
             {
                 List<Attack> attacks = new List<Attack>();
-                foreach (var oppnent in opponents)
+                foreach (var opponent in opponents)
                 {
-                    attacks.Add(new Attack(caster, oppnent, 1.4f));
+                    attacks.Add(new Attack(caster, opponent, 1.4f));
                 }
 
                 return new SpellResult($"{caster.Name} struck {string.Join(", ", attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})"))}.", SpellResultType.Ok);

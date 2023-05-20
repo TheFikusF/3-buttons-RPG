@@ -4,7 +4,7 @@ using RPG.Items;
 
 namespace RPG.Entities
 {
-    public class God : Entity
+    public class God : EffectedEntity
     {
         private string _description = "";
 

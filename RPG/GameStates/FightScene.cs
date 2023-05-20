@@ -1,7 +1,5 @@
 ﻿using RPG.Data;
 using RPG.Entities;
-using RPG.Items;
-using RPG.Items.Serialization;
 using System.Text;
 
 namespace RPG.GameStates
@@ -15,6 +13,7 @@ namespace RPG.GameStates
         public FightScene(Player player, List<Enemy> enemies) : base(player)
         {
             _enemies = enemies;
+            enemies[0].ApplyEffect(new Effect(EffectType.Burn, 5, 5));
             _turnLog = new List<string>();
 
             Button1Title = "Attack";
@@ -29,24 +28,30 @@ namespace RPG.GameStates
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Turn #{_turn}");
             stringBuilder.AppendLine(Player.ToShortString());
-            stringBuilder.AppendLine(new string('-', 35));
+            stringBuilder.AppendLine($":==={new string('-', 35)}");
             stringBuilder.AppendLine(string.Join(Environment.NewLine, _turnLog));
-            stringBuilder.AppendLine(new string('-', 35));
-            stringBuilder.AppendLine(string.Join(Environment.NewLine, _enemies.Select(x => x.ToShortString())));
+            stringBuilder.AppendLine($":==={new string('-', 35)}");
+            stringBuilder.AppendLine(string.Join(Environment.NewLine + new string('-', 35) + Environment.NewLine, 
+                _enemies.Select(x => $"{x.ToShortString()}{Environment.NewLine}{string.Join(Environment.NewLine, x.Effects.Select(j => j.ToString(x)))}")));
 
             return stringBuilder.ToString();
         }
 
-        public override GameState Button1()
+        public override void ButtonPressStart()
         {
             _turnLog = new List<string>();
+        }
+
+        public override GameState Button1()
+        {
             if (!_enemies.Any(x => x.Health.Value > 0))
             {
-                ItemsRepository.TryGetItem("Zweihander", out Item item);
-                return new RewardScreen(Player, 50, 50, new List<Item> { item });
+                return GetRewardScreen();
             }
 
             _turnLog.Add(new Attack(Player, _enemies.First(x => x.Health.Value > 0)).ToString());
+            _turnLog.Add(string.Join(Environment.NewLine, Player.TakeEffectsTurn()));
+
             PerformEnemyTurn();
 
             return this;
@@ -54,46 +59,45 @@ namespace RPG.GameStates
 
         public override GameState Button2()
         {
-            _turnLog = new List<string>();
             if (!_enemies.Any(x => x.Health.Value > 0))
             {
-                ItemsRepository.TryGetItem("Zweihander", out Item item);
-                return new RewardScreen(Player, 50, 50, new List<Item> { item });
+                return GetRewardScreen();
             }
 
-            EntityActions.SpellResult result = Player.CastSpell(0, _enemies.Where(x => x.Health.Value > 0).Cast<Entity>().ToList());
-            _turnLog.Add(result.Description);
-
-            if(result.ResultType == EntityActions.SpellResultType.NotEnoughMana)
-            {
-                return this;
-            }
-
-            PerformEnemyTurn();
-
+            CastSpell(0);
             return this;
         }
 
         public override GameState Button3()
         {
-            _turnLog = new List<string>();
             if (!_enemies.Any(x => x.Health.Value > 0))
             {
-                ItemsRepository.TryGetItem("Zweihander", out Item item);
-                return new RewardScreen(Player, 50, 50, new List<Item> { item });
+                return GetRewardScreen();
             }
 
-            EntityActions.SpellResult result = Player.CastSpell(1, _enemies.Where(x => x.Health.Value > 0).Cast<Entity>().ToList());
+            CastSpell(1);
+            return this;
+        }
+
+        private GameState GetRewardScreen()
+        {
+            int healthSum = _enemies.Sum(x => x.Health.MaxValue);
+            return new RewardScreen(Player, (int)(healthSum * 0.5), (int)(healthSum * 0.5), _enemies.SelectMany(x => x.Inventory.Items).ToList());
+        }
+
+        private void CastSpell(int slot)
+        {
+            EntityActions.SpellResult result = Player.CastSpell(slot, _enemies.Where(x => x.Health.Value > 0).Cast<Entity>().ToList());
             _turnLog.Add(result.Description);
 
             if (result.ResultType == EntityActions.SpellResultType.NotEnoughMana)
             {
-                return this;
+                return;
             }
 
-            PerformEnemyTurn();
+            Player.TakeEffectsTurn();
 
-            return this;
+            PerformEnemyTurn();
         }
 
         private void PerformEnemyTurn()
@@ -105,6 +109,7 @@ namespace RPG.GameStates
                     continue;
                 }
                 _turnLog.Add(new Attack(enemy, Player).ToString());
+                _turnLog.Add(string.Join(Environment.NewLine, enemy.TakeEffectsTurn()));
             }
         }
     }
