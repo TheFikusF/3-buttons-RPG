@@ -199,8 +199,8 @@ namespace RPG.Entities
 
         public string ToShortString()
         {
-            var str = $"|| Entity: {Name}{$"LVL {Level}".PadLeft(23 - Name.Length)}" + Environment.NewLine +
-                $"Health: {Health.Value}/{Health.MaxValue}";
+            var str = $"|> Entity: {Name}{$"LVL {Level}".PadLeft(23 - Name.Length)}" + Environment.NewLine +
+                $"| Health: {Health.Value}/{Health.MaxValue}";
 
             return str;
         }

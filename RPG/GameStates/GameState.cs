@@ -20,6 +20,7 @@ namespace RPG.GameStates
         public abstract string GetStateText();
 
         public virtual void ButtonPressStart() { }
+        public virtual void ButtonPressEnd() { }
 
         public virtual GameState Button1() { return this; }
         public virtual GameState Button2() { return this; }

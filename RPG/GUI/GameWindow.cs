@@ -112,6 +112,8 @@ namespace RPG.GUI
 
         private void SetCurrentState(GameState state)
         {
+            _currentState?.ButtonPressEnd();
+
             if (_currentState != state)
             {
                 _currentState = state;

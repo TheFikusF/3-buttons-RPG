@@ -1,4 +1,5 @@
-﻿using RPG.Data;
+﻿using Newtonsoft.Json.Linq;
+using RPG.Data;
 using RPG.Entities;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace RPG.GameStates
         public FightScene(Player player, List<Enemy> enemies) : base(player)
         {
             _enemies = enemies;
-            enemies[0].ApplyEffect(new Effect(EffectType.Burn, 5, 5));
+            _enemies[0].ApplyEffect(new Effect(EffectType.Stun, 0, 2));
             _turnLog = new List<string>();
 
             Button1Title = "Attack";
@@ -23,23 +24,28 @@ namespace RPG.GameStates
 
         public override string GetStateText()
         {
-            _turn++;
-
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Turn #{_turn}");
             stringBuilder.AppendLine(Player.ToShortString());
             stringBuilder.AppendLine($":==={new string('-', 35)}");
             stringBuilder.AppendLine(string.Join(Environment.NewLine, _turnLog));
             stringBuilder.AppendLine($":==={new string('-', 35)}");
-            stringBuilder.AppendLine(string.Join(Environment.NewLine + new string('-', 35) + Environment.NewLine, 
-                _enemies.Select(x => $"{x.ToShortString()}{Environment.NewLine}{string.Join(Environment.NewLine, x.Effects.Select(j => j.ToString(x)))}")));
+            stringBuilder.AppendLine(string.Join(Environment.NewLine + $"|{new string('-', 35)}" + Environment.NewLine, 
+                _enemies.Select(x => $"{x.ToShortString()}" + (x.Effects.Count > 0 ?
+                $"{ Environment.NewLine}{ string.Join(Environment.NewLine, x.Effects.Select(j => $"| {j.ToString(x)}"))}" : string.Empty))));
 
             return stringBuilder.ToString();
         }
 
         public override void ButtonPressStart()
         {
+            _turn++;
             _turnLog = new List<string>();
+        }
+
+        public override void ButtonPressEnd()
+        {
+            CheckHealth();
         }
 
         public override GameState Button1()
@@ -49,10 +55,15 @@ namespace RPG.GameStates
                 return GetRewardScreen();
             }
 
-            _turnLog.Add(new Attack(Player, _enemies.First(x => x.Health.Value > 0)).ToString());
-            _turnLog.Add(string.Join(Environment.NewLine, Player.TakeEffectsTurn()));
+            if (CheckCanMove(Player))
+            {
+                _turnLog.Add(new Attack(Player, _enemies.First(x => x.Health.Value > 0)).ToString());
+            }
+            
+            AddToTurnLog(Player.TakeEffectsTurn());
+            _turnLog.Add(string.Empty);
 
-            PerformEnemyTurn();
+            PerformEnemiesTurn();
 
             return this;
         }
@@ -87,20 +98,23 @@ namespace RPG.GameStates
 
         private void CastSpell(int slot)
         {
-            EntityActions.SpellResult result = Player.CastSpell(slot, _enemies.Where(x => x.Health.Value > 0).Cast<Entity>().ToList());
-            _turnLog.Add(result.Description);
-
-            if (result.ResultType == EntityActions.SpellResultType.NotEnoughMana)
+            if(CheckCanMove(Player))
             {
-                return;
+                EntityActions.SpellResult result = Player.CastSpell(slot, _enemies.Where(x => x.Health.Value > 0).Cast<Entity>().ToList());
+                _turnLog.Add(result.Description);
+
+                if (result.ResultType == EntityActions.SpellResultType.NotEnoughMana)
+                {
+                    return;
+                }
             }
 
             Player.TakeEffectsTurn();
 
-            PerformEnemyTurn();
+            PerformEnemiesTurn();
         }
 
-        private void PerformEnemyTurn()
+        private void PerformEnemiesTurn()
         {
             foreach (Enemy enemy in _enemies)
             {
@@ -108,8 +122,42 @@ namespace RPG.GameStates
                 {
                     continue;
                 }
-                _turnLog.Add(new Attack(enemy, Player).ToString());
-                _turnLog.Add(string.Join(Environment.NewLine, enemy.TakeEffectsTurn()));
+
+                if(CheckCanMove(enemy))
+                {
+                    _turnLog.Add(new Attack(enemy, Player).ToString());
+                }
+
+                AddToTurnLog(enemy.TakeEffectsTurn());
+                _turnLog.Add(string.Empty);
+            }
+        }
+
+        private void CheckHealth()
+        {
+            if(_enemies.All(x => x.Health.Value <= 0))
+            {
+                Button1Title = "Continue";
+                Button2Title = string.Empty;
+                Button3Title = string.Empty;
+            }
+        }
+
+        private bool CheckCanMove(EffectedEntity entity)
+        {
+            if(entity.Stunned)
+            {
+                _turnLog.Add($"{entity.Name} is stunned!");
+            }
+
+            return !entity.Stunned;
+        }
+
+        private void AddToTurnLog(List<string> logs)
+        {
+            if (logs.Count > 0)
+            {
+                _turnLog.Add(string.Join(Environment.NewLine, logs));
             }
         }
     }

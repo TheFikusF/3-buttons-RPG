@@ -45,7 +45,7 @@ namespace RPG.Data
             {
                 if (_summedEventChances == null)
                 {
-                    _summedEventChances = new();
+                    _summedEventChances = new Dictionary<EventType, float>();
 
                     float sum = 0;
                     foreach (var e in EventDataTable)
