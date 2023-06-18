@@ -26,5 +26,10 @@ namespace RPG.GameStates
         {
             return new InventoryView(Player);
         }
+
+        public override GameState Button3()
+        {
+            return new MarketScreen(Player, this);
+        }
     }
 }
