@@ -1,5 +1,4 @@
 ﻿using RPG.Entities;
-using Terminal.Gui;
 
 namespace RPG.GameStates
 {
@@ -9,7 +8,7 @@ namespace RPG.GameStates
         {
             Button1Title = "Go!";
             Button2Title = "Inventory";
-            Button3Title = "";
+            Button3Title = "Skills";
         }
 
         public override string GetStateText()
@@ -29,7 +28,7 @@ namespace RPG.GameStates
 
         public override GameState Button3()
         {
-            return new MarketScreen(Player, this);
+            return new SkillsChooserScreen(Player, this);
         }
     }
 }

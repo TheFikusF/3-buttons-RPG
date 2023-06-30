@@ -1,4 +1,5 @@
 ﻿using RPG.Data;
+using RPG.GameStates;
 
 namespace RPG.Entities
 {
@@ -9,7 +10,7 @@ namespace RPG.Entities
             Ok, NotEnoughMana,
         }
 
-        public class Spell
+        public class Spell : IListStateItem
         {
             public readonly string Name;
             public readonly string Description;
@@ -47,9 +48,24 @@ namespace RPG.Entities
                 return new SpellResult($"{caster.Name} struck {string.Join(", ", attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})"))}.", SpellResultType.Ok);
             }, 25);
 
-            public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}{Environment.NewLine}|: {Description}";
+            public static Spell Heal() => new Spell("Heal", "Heal yourself for 3 rounds for 10 hp.", (caster, opponents) =>
+            {
+                if(caster is EffectedEntity entity)
+                {
+                    entity.ApplyEffect(new Effect(EffectType.HealOT, 10, 3));
+                }
+
+                return new SpellResult($"{caster.Name} applyed heal.", SpellResultType.Ok);
+            }, 25);
+
+            public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}";
 
             public string ShortToString() => $"{Name}";
+
+            public string GetFullString(int pad)
+            {
+                return ToString() + Environment.NewLine + $"{new string(' ', pad)}|| {Description}";
+            }
         }
 
         public struct SpellResult

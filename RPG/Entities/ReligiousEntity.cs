@@ -36,6 +36,10 @@ namespace RPG.Entities
             AddMana(Mana.MaxValue);
         }
 
+        public ReligiousEntity(SerializedEntity serializedEntity, int level, int actionsSlots = 1) : base(serializedEntity, level, actionsSlots)
+        {
+        }
+
         public override string ToString() => base.ToString() + Environment.NewLine + "God: " + (God is null ? "none" : $"{God.Name}");
 
         public void SetGod(God god)

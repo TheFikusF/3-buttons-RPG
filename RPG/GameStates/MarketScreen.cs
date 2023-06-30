@@ -23,6 +23,19 @@ namespace RPG.GameStates
             },
             "Market1");
 
+            SetupList(list1, new List<ListStateItemInteraction>()
+            {
+                new ListStateItemInteraction("Remove", (item, index) =>
+                {
+                    list1.Items.Remove(item);
+                }),
+
+                new ListStateItemInteraction("Delete", (item, index) =>
+                {
+                    list1.Items.Remove(item);
+                }),
+            });
+
             var list2 = new ItemsList(new List<LabeledListStateItem>()
             {
                 new LabeledListStateItem("first", new SellableItem()),
@@ -32,30 +45,17 @@ namespace RPG.GameStates
             },
             "Market2");
 
-            SetupList(list1, new List<Action<IListStateItem, int>>()
+            SetupList(list2, new List<ListStateItemInteraction>()
             {
-                (item, index) =>
-                {
-                    list1.Items.Remove(item);
-                },
-
-                (item, index) =>
-                {
-                    list1.Items.Remove(item);
-                },
-            });
-
-            SetupList(list2, new List<Action<IListStateItem, int>>()
-            {
-                (item, index) =>
+                new ListStateItemInteraction("Kill", (item, index) =>
                 {
                     list2.Items.RemoveAt(index);
-                },
+                }),
 
-                (item, index) =>
+                new ListStateItemInteraction("Destroy", (item, index) =>
                 {
                     list2.Items.RemoveAt(index);
-                },
+                }),
             });
         }
     }

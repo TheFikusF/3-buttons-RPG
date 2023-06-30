@@ -30,6 +30,7 @@ namespace RPG.GUI
 
             _player = new Player(SerializedEntity.FromJSON("Player.json"), 1);
             _player.Actions.EquipSpell(EntityActions.Spell.Cleave(), 0);
+            _player.Actions.AddSpell(EntityActions.Spell.Heal());
 
             SetCurrentState(new MainScreen(_player));
         }

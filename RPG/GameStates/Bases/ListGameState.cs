@@ -10,6 +10,18 @@ namespace RPG.GameStates
             List, Selection
         }
 
+        public class ListStateItemInteraction
+        {
+            public string Name { get; set; }
+            public Action<IListStateItem, int> Interaction { get; set; }
+            
+            public ListStateItemInteraction(string name, Action<IListStateItem, int> interaction)
+            {
+                Name = name;
+                Interaction = interaction;
+            }
+        }
+
         public class LabeledListStateItem : IListStateItem
         {
             public string Name { get; set; }
@@ -34,15 +46,17 @@ namespace RPG.GameStates
 
             private List<IListStateItem> _items;
 
-            private List<Action<IListStateItem, int>> _interactionCallbacks;
+            private List<ListStateItemInteraction> _interactionCallbacks;
 
-            public List<IListStateItem> Items => _items;
+            public List<IListStateItem> Items { get => _items; }
+            public List<ListStateItemInteraction> InteractionCallbacks => _interactionCallbacks.ToList();
 
             public int LabelWidth { get; set; } = 10;
             public string SelectedPrefix { get; set; } = "•>";
             public string DefaultPrefix { get; set; } = "|";
 
-            public int ItemsCount => _items.Count;
+            public int ItemsCount => Items.Count;
+
 
             private ItemsList(string name, bool useLabels)
             {
@@ -55,7 +69,15 @@ namespace RPG.GameStates
                 _items = items.ToList();
             }
 
-            public void SetInteractionCallbacks(List<Action<IListStateItem, int>> interactionCallbacks) => _interactionCallbacks = interactionCallbacks;
+            public void SetInteractionCallbacks(List<ListStateItemInteraction> interactionCallbacks)
+            {
+                _interactionCallbacks = interactionCallbacks;
+            }
+
+            public void SetItems(IEnumerable<IListStateItem> items)
+            {
+                _items = items.ToList();
+            }
 
             public void Interact(int interactionIndex, int itemIndex)
             {
@@ -64,18 +86,19 @@ namespace RPG.GameStates
                     return;
                 }
 
-                _interactionCallbacks[interactionIndex]?.Invoke(_useLabels ? (_items[itemIndex] as LabeledListStateItem).Item : _items[itemIndex], itemIndex);
+                _interactionCallbacks[interactionIndex].Interaction?.Invoke(_useLabels ? (Items[itemIndex] as LabeledListStateItem).Item : Items[itemIndex], itemIndex);
             }
 
             public virtual string ToString(int index)
             {
-                var str = _name + Environment.NewLine + new string('-', 35) + Environment.NewLine;
-                return str + (_useLabels ? GetLabeledListString(index) : GetListString(index));
+                var str = $"{_name}{Environment.NewLine}{new string('-', 35)}{Environment.NewLine}";
+                return str + (Items.Count == 0 ? $"Empty{Environment.NewLine}" :
+                    (_useLabels ? GetLabeledListString(index) : GetListString(index)));
             }
 
             protected virtual string GetListString(int index)
             {
-                return string.Join(Environment.NewLine, _items.Select((x, i) => i == index ?
+                return string.Join(Environment.NewLine, Items.Select((x, i) => i == index ?
                     $"{SelectedPrefix} {x.GetFullString(0)}" : $"{DefaultPrefix} {x}"));
             }
 
@@ -98,7 +121,7 @@ namespace RPG.GameStates
 
                     if (index == currentIndex)
                     {
-                        str += $" {item.Item.GetFullString(LabelWidth)}";
+                        str += $" {item.Item.GetFullString(LabelWidth + 2)}";
                     }
 
                     if (index != currentIndex)
@@ -109,7 +132,7 @@ namespace RPG.GameStates
                     return str;
                 }
 
-                return string.Join(Environment.NewLine, _items.Select((x, i) => $"{GetItemString(x as LabeledListStateItem, i)}"));
+                return string.Join(Environment.NewLine, Items.Select((x, i) => $"{GetItemString(x as LabeledListStateItem, i)}"));
             }
         }
 
@@ -126,10 +149,11 @@ namespace RPG.GameStates
             _stateToExit = stateToExit;
         }
 
-        protected void SetupList(ItemsList list, List<Action<IListStateItem, int>> interactionCallbacks)
+        protected void SetupList(ItemsList list, List<ListStateItemInteraction> interactionCallbacks)
         {
             _lists.Add(list);
             list.SetInteractionCallbacks(interactionCallbacks);
+            UpdateButtonTitles();
         }
 
         public override string GetStateText()
@@ -145,6 +169,11 @@ namespace RPG.GameStates
             }
 
             return builder.ToString();
+        }
+
+        public override void ButtonPressEnd()
+        {
+            UpdateButtonTitles();
         }
 
         public override GameState Button1()
@@ -179,7 +208,7 @@ namespace RPG.GameStates
         {
             switch (_state)
             {
-                case ListViewState.List:
+                case ListViewState.List when _index < _lists.Sum(x => x.ItemsCount) - 1:
                     _index++;
                     return this;
                 case ListViewState.Selection:
@@ -213,6 +242,24 @@ namespace RPG.GameStates
             }
 
             return (0, 0);
+        }
+
+        private void UpdateButtonTitles()
+        {
+            switch (_state)
+            {
+                case ListViewState.List:
+                    Button1Title = "Selection";
+                    Button2Title = _index == 0 ? "Exit" : "Prev";
+                    Button3Title = "Next";
+                    break;
+                case ListViewState.Selection:
+                    (int listIndex, _) = CurrentListIndex();
+                    Button1Title = "List";
+                    Button2Title = _lists[listIndex].InteractionCallbacks[0].Name;
+                    Button3Title = _lists[listIndex].InteractionCallbacks[1].Name;
+                    break;
+            }
         }
     }
 }

@@ -1,11 +1,19 @@
 ﻿using RandN;
+using RandN.Compat;
 
 namespace RPG.Utils
 {
     public static class Extensions
     {
-        private static SmallRng _rng = SmallRng.Create();
+        private static readonly SmallRng _rng;
+        private static readonly RandomShim<SmallRng> _randomGenerator;
         public static SmallRng RNG => _rng;
+
+        static Extensions()
+        {
+            _rng = SmallRng.Create();
+            _randomGenerator = RandomShim.Create(RNG);
+        }
 
         public static T PickRandom<T>(this List<T> list) => list[new Random().Next(0, list.Count)];
 
@@ -22,5 +30,8 @@ namespace RPG.Utils
         {
             return a * (1 - t) + b * t;
         }
+
+        public static int GetRandom(int max) => GetRandom(max, 0);
+        public static int GetRandom(int min, int max) => _randomGenerator.Next(min, max);
     }
 }
