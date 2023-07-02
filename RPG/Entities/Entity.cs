@@ -101,17 +101,17 @@ namespace RPG.Entities
         { 
             foreach(string itemName in serializedEntity.EquipedItems)
             {
-                if(ItemsRepository.TryGetItem(itemName, out Item item))
+                if(ItemsRepository.TryGetItem(itemName, out InventoryItem item))
                 {
-                    Inventory.Equip(new Item(item));
+                    Inventory.Equip(new InventoryItem(item));
                 }
             }
 
             foreach (string itemName in serializedEntity.Inventory)
             {
-                if (ItemsRepository.TryGetItem(itemName, out Item item))
+                if (ItemsRepository.TryGetItem(itemName, out InventoryItem item))
                 {
-                    Inventory.AddToInventory(new Item(item));
+                    Inventory.AddToInventory(new InventoryItem(item));
                 }
             }
         }
@@ -145,6 +145,17 @@ namespace RPG.Entities
             AddMana(Mana.MaxValue);
             _levelUpPoints--;
 
+            return true;
+        }
+
+        public bool TryTakeMoney(int amount)
+        {
+            if(_money - amount < 0)
+            {
+                return false;
+            }
+
+            _money -= amount;
             return true;
         }
 

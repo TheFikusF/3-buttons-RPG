@@ -59,6 +59,10 @@ namespace RPG.Entities.NPCSpecializations
 
             SellableItem itemToSell = _itemsToSell[itemIndex];
 
+            if (player.TryTakeMoney(_itemsToSell[itemIndex].Price))
+            {
+                //player.Inventory.AddToInventory()
+            }
         }
     }
 }

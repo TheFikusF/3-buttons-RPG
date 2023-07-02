@@ -1,5 +1,4 @@
-﻿using RPG.Entities.Serialization;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace RPG.Items
 {
@@ -8,44 +7,40 @@ namespace RPG.Items
         private class InventorySlot
         {
             private SlotType _slotType;
-            private Item _item;
+            private InventoryItem? _item;
 
             public SlotType Type => _slotType;
-            public Item Item => _item;
+            public InventoryItem? Item => _item;
 
-            public InventorySlot(SlotType slotType, Item item = null)
+            public InventorySlot(SlotType slotType, InventoryItem? item = null)
             {
                 _slotType = slotType;
                 _item = item;
             }
 
-            public Item Unequip()
+            public InventoryItem? Unequip()
             {
-                Item item = _item;
+                InventoryItem? item = _item;
                 _item = null;
                 return item;
             }
 
-            public void Equip(Item item) => _item = item;
+            public void Equip(InventoryItem item) => _item = item;
         }
 
         private List<InventorySlot> _slots;
         private List<Item> _inventory;
 
-        public Item this[SlotType key]
+        public InventoryItem? this[SlotType key]
         {
             get
             {
                 var item = _slots.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == key);
-                if (item == null)
-                {
-                    return null;
-                }
 
-                return item.Item;
+                return item?.Item;
             }
         }
-        public Item this[int index] => index >= 0 && index < _inventory.Count ? _inventory[index] : null;
+        public Item? this[int index] => index >= 0 && index < _inventory.Count ? _inventory[index] : null;
 
         public int Attack => _slots.GroupBy(x => x.Item).Sum(x => x.Key == null ? 0 : x.Key.Attack);
         public int Defence => _slots.GroupBy(x => x.Item).Sum(x => x.Key == null ? 0 : x.Key.Defence);
@@ -78,19 +73,23 @@ namespace RPG.Items
                 SlotType.Feet,
                 SlotType.Accessory, SlotType.Accessory, SlotType.Accessory };
 
-        public void AddToInventory(Item item)
+        public void AddToInventory(InventoryItem item)
         {
             _inventory.Add(item);
         }
 
         public void Equip(int index)
         {
+
             var item = _inventory[index - SlotsCount];
-            _inventory.RemoveAt(index - SlotsCount);
-            Equip(item);
+            if(item is InventoryItem inventoryItem)
+            {
+                _inventory.RemoveAt(index - SlotsCount);
+                Equip(inventoryItem);
+            }
         }
 
-        public void Equip(Item item)
+        public void Equip(InventoryItem item)
         {
             foreach (var slotType in item.Slots)
             {
@@ -120,11 +119,11 @@ namespace RPG.Items
                 }
             }
 
-            void EquipItem(Item item, List<InventorySlot> equiped, IEnumerable<InventorySlot> suitable)
+            void EquipItem(InventoryItem item, List<InventorySlot> equiped, IEnumerable<InventorySlot> suitable)
             {
                 InventorySlot slot = suitable.First(x => x.Item == null);
 
-                Item unequipedItem = slot.Unequip();
+                InventoryItem? unequipedItem = slot.Unequip();
                 if (unequipedItem is not null)
                 {
                     _inventory.Add(unequipedItem);
@@ -137,7 +136,7 @@ namespace RPG.Items
 
         public void Unequip(int index) => Unequip(_slots[index].Unequip());
 
-        public void Unequip(Item item)
+        public void Unequip(InventoryItem? item)
         {
             if (item is null)
             {

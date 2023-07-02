@@ -14,9 +14,9 @@ namespace RPG.GameStates
 
         private Queue<Item> _items;
 
-        private Item _currentItem;
+        private InventoryItem _currentItem;
 
-        public RewardScreen(Player player, int experience, int gold, List<Item> items) : base(player)
+        public RewardScreen(Player player, int experience, int gold, IEnumerable<Item> items) : base(player)
         {
             _experience = experience;
             _gold = gold;
@@ -107,10 +107,10 @@ namespace RPG.GameStates
 
         private GameState GetNextState()
         {
-            bool got = _items.TryDequeue(out Item item);
+            bool got = _items.TryDequeue(out Item item) && (item is InventoryItem);
             if(got)
             {
-                _currentItem = item;
+                _currentItem = item as InventoryItem;
                 DrawItemButtons();
             }
         
