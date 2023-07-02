@@ -1,4 +1,5 @@
 ﻿using RPG.GameStates;
+using RPG.Items;
 using RPG.Items.Serialization;
 using RPG.Utils;
 
@@ -11,14 +12,17 @@ namespace RPG.Entities.NPCSpecializations
 
         public class SellableItem : IListStateItem
         {
+            private Item _item;
             private int _price;
 
+            public Item Item => _item;
             public int Price => _price;
-            
-            public SellableItem(int price)
+
+            public SellableItem(Item item, int price)
             {
+                _item = item;
                 _price = price;
-            }            
+            }  
             
             public string GetFullString(int pad)
             {
@@ -45,13 +49,13 @@ namespace RPG.Entities.NPCSpecializations
 
             for(int i = 0; i < Extensions.GetRandom(_minSellItem, _maxSellItem); i++)
             {
-                ItemsRepository.Items.ToList().PickRandom();
+                InventoryItem item = ItemsRepository.Items.ToList().PickRandom().Value.PickRandom();
+                _itemsToSell.Add(new SellableItem(item, (int)((item.Defence + item.Attack + item.Health) * 1.5f)));
             }
         }
         
         public void SellItemToPlayer(Player player, int itemIndex)
         {
-            // Check if the itemIndex is valid
             if (itemIndex < 0 || itemIndex >= _itemsToSell.Count)
             {
                 throw new IndexOutOfRangeException("The item index provided is out of range.");

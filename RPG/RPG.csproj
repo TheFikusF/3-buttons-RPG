@@ -12,8 +12,9 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RandN" Version="0.3.0" />
-    <PackageReference Include="Terminal.Gui" Version="1.10.0" />
+    <PackageReference Include="NLua" Version="1.6.3" />
+    <PackageReference Include="RandN" Version="0.4.0" />
+    <PackageReference Include="Terminal.Gui" Version="1.12.1" />
   </ItemGroup>
 
 </Project>
