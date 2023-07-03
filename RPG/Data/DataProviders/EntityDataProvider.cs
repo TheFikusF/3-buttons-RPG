@@ -30,7 +30,7 @@ namespace RPG.Data.DataProviders
             _gods = new List<God> { new God("Odin", 300,
                 Inventory.Human(),
                 new EntityStats(40, 50, 60),
-                new EntityActions(2, new List<EntityActions.Spell>() { EntityActions.Spell.ThunderStike() }),
+                new EntityActions(2, new List<EntityActions.Spell>() { EntityActions.Spell.ThunderStrike() }),
                 1, 20, 100, description: "Wise Odin")
             };
         }

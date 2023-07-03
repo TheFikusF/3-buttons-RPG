@@ -1,4 +1,5 @@
-﻿using RPG.Data;
+﻿using NLua;
+using RPG.Data;
 using RPG.Entities.Serialization;
 using RPG.Entities.Stats;
 using RPG.Items;
@@ -84,6 +85,14 @@ namespace RPG.Entities
             _critMultiplier = critMultiplier;
 
             _lastDamageTook = 0;
+
+/*            using(var lua = new Lua())
+            {
+                foreach(var method in GetType().GetMethods().Where(x => x.IsPublic))
+                {
+                    lua.RegisterFunction(method.Name, this, method);
+                }
+            }*/
 
             AllocatePoints();
         }

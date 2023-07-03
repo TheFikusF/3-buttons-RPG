@@ -14,7 +14,6 @@ namespace RPG.GameStates
         public FightScene(Player player, List<Enemy> enemies) : base(player)
         {
             _enemies = enemies;
-            _enemies[0].ApplyEffect(new Effect(EffectType.Stun, 0, 2));
             _turnLog = new List<string>();
 
             Button1Title = "Attack";

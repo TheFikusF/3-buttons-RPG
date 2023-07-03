@@ -1,4 +1,5 @@
-﻿using RPG.Data;
+﻿using NLua;
+using RPG.Data;
 using RPG.GameStates;
 
 namespace RPG.Entities
@@ -26,6 +27,30 @@ namespace RPG.Entities
                 ManaCost = manaCost;
             }
 
+            public Spell(string name, string description, string luaAction, int manaCost)
+            {
+                Name = name;
+                Description = description;
+                Action = (caster, opponents) =>
+                {
+                    SpellResult result = new SpellResult($"{caster.Name} casted {name}", SpellResultType.Ok);
+
+                    using (var lua = new Lua())
+                    {
+                        lua[nameof(caster)] = caster;
+
+                        lua[nameof(opponents)] = opponents;
+                        lua[nameof(SpellResultType)] = typeof(SpellResultType);
+                        lua[nameof(result)] = result;
+
+                        lua.DoString(luaAction);
+                    }
+
+                    return result;
+                };
+                ManaCost = manaCost;
+            }
+
             public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack.", (caster, opponents) =>
             {
                 List<Attack> attacks = new List<Attack>();
@@ -37,7 +62,7 @@ namespace RPG.Entities
                 return new SpellResult($"{caster.Name} cleaved {string.Join(", ",attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})" ))}.", SpellResultType.Ok);
             }, 10);
 
-            public static Spell ThunderStike() => new Spell("ThunderStike", "You strike enemies from the sky.", (caster, opponents) =>
+            public static Spell ThunderStrike() => new Spell("ThunderStrike", "You strike enemies from the sky.", (caster, opponents) =>
             {
                 List<Attack> attacks = new List<Attack>();
                 foreach (var opponent in opponents)
@@ -48,15 +73,16 @@ namespace RPG.Entities
                 return new SpellResult($"{caster.Name} struck {string.Join(", ", attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})"))}.", SpellResultType.Ok);
             }, 25);
 
-            public static Spell Heal() => new Spell("Heal", "Heal yourself for 3 rounds for 10 hp.", (caster, opponents) =>
-            {
-                if(caster is EffectedEntity entity)
-                {
-                    entity.ApplyEffect(new Effect(EffectType.HealOT, 10, 3));
-                }
+            public static Spell Heal() => new Spell("Heal", "Heal yourself for 3 rounds for 10 hp.", @"
+                        result.Description = caster.Name .. "" applied heal.""
+                        result.ResultType = SpellResultType.Ok
+                        
+                        for i = 0, opponents.Count - 1 do
+                            opponents[i]:TryTakeDamage(100)
+                        end
 
-                return new SpellResult($"{caster.Name} applyed heal.", SpellResultType.Ok);
-            }, 25);
+                        caster:Heal(200)
+                    ", 25);
 
             public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}";
 
@@ -68,7 +94,7 @@ namespace RPG.Entities
             }
         }
 
-        public struct SpellResult
+        public class SpellResult
         {
             public readonly string Description;
             public readonly SpellResultType ResultType;
