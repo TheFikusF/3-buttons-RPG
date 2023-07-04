@@ -8,8 +8,8 @@ namespace RPG.GameStates
         {
             var list1 = new ItemsList(new List<LabeledListStateItem>()
             {
-                new LabeledListStateItem("Main skill", player.Actions.EquipedSpells[0]),
-                new LabeledListStateItem("God's skill", player.Actions.EquipedSpells[1]),
+                new LabeledListStateItem("Main skill", player.Actions.EquippedSpells[0]),
+                new LabeledListStateItem("God's skill", player.Actions.EquippedSpells[1]),
             }, "Equipped spells");
 
             SetupList(list1, new List<ListStateItemInteraction>()
@@ -29,8 +29,8 @@ namespace RPG.GameStates
 
                     list1.SetItems(new List<LabeledListStateItem>()
                     {
-                        new LabeledListStateItem("Main skill", player.Actions.EquipedSpells[0]),
-                        new LabeledListStateItem("God's skill", player.Actions.EquipedSpells[1]),
+                        new LabeledListStateItem("Main skill", player.Actions.EquippedSpells[0]),
+                        new LabeledListStateItem("God's skill", player.Actions.EquippedSpells[1]),
                     });
 
                     list2.SetItems(player.Actions.Spells.Where(x => !x.Item2).Select(x => x.Item1));

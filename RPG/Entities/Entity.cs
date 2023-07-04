@@ -168,7 +168,7 @@ namespace RPG.Entities
             return true;
         }
 
-        public virtual bool TryTakeDamage(int amount)
+        public virtual bool TryTakeDamage(int amount, Entity? attacker)
         {
             var initialHealth = _health.Value;
             _health.Value -= amount - Defence;

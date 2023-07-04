@@ -11,16 +11,26 @@ namespace RPG.Data
     {
         public readonly EffectType Type;
         public readonly float Value;
+        public readonly Entity EffectCaster;
         
         private int _turnsCount;
 
         public int TurnsLeft => _turnsCount;
 
-        public Effect(EffectType type, float value, int turnsCount)
+        public Effect(EffectType type, float value, int turnsCount, Entity effectCaster)
         {
             Type = type;
             Value = value;
             _turnsCount = turnsCount;
+            EffectCaster = effectCaster;
+        }
+
+        public Effect(int type, float value, int turnsCount, Entity effectCaster)
+        {
+            Type = (EffectType)type;
+            Value = value;
+            _turnsCount = turnsCount;
+            EffectCaster = effectCaster;
         }
 
         public string TakeTurn(Entity entity)
@@ -30,14 +40,14 @@ namespace RPG.Data
             switch (Type)
             {
                 case EffectType.Burn:
-                    entity.TryTakeDamage((int)Value);
+                    entity.TryTakeDamage((int)Value, EffectCaster);
                     return $"{entity.Name} took {entity.LastDamageTook} burning!";
                 case EffectType.Poison:
-                    entity.TryTakeDamage((int)Value);
+                    entity.TryTakeDamage((int)Value, EffectCaster);
                     return $"{entity.Name} took {entity.LastDamageTook} decaying!";
                 case EffectType.HealOT:
                     entity.Heal((int)Value);
-                    return $"{entity.Name} healed for {entity.LastDamageTook} decaying!";
+                    return $"{entity.Name} healed for {entity.LastDamageTook} points!";
                 default:
                     return string.Empty;
             }
@@ -49,8 +59,8 @@ namespace RPG.Data
             {
                 EffectType.Burn => $"{entity.Name} is burning. Takes {Value} damage for {TurnsLeft} turns.",
                 EffectType.Poison => $"{entity.Name} is plagued. Takes {Value} damage for {TurnsLeft} turns.",
-                EffectType.Stun => $"{entity.Name} is stuned and can't move for {TurnsLeft} turns.",
-                EffectType.InDamageAmp => $"{entity.Name} is weakned. Takes x{Value} damage for {TurnsLeft} turns.",
+                EffectType.Stun => $"{entity.Name} is stunned and can't move for {TurnsLeft} turns.",
+                EffectType.InDamageAmp => $"{entity.Name} is weakened. Takes x{Value} damage for {TurnsLeft} turns.",
                 EffectType.InHealAmp => $"{entity.Name} takes increased heal. x{Value} heal for {TurnsLeft} turns.",
                 EffectType.OutDamageAmp => $"{entity.Name} is courageous. Deals x{Value} damage for {TurnsLeft} turns.",
                 EffectType.HealOT => $"{entity.Name} is regenerating. {Value} health for {TurnsLeft} turns.",

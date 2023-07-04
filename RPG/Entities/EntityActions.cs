@@ -1,6 +1,8 @@
 ﻿using NLua;
 using RPG.Data;
 using RPG.GameStates;
+using Newtonsoft.Json;
+using RPG.Utils;
 
 namespace RPG.Entities
 {
@@ -11,19 +13,23 @@ namespace RPG.Entities
             Ok, NotEnoughMana,
         }
 
+        [Serializable]
         public class Spell : IListStateItem
         {
-            public readonly string Name;
-            public readonly string Description;
-            
-            public readonly Func<Entity, List<Entity>, SpellResult> Action;
-            public readonly int ManaCost;
+            [JsonProperty("Name")] public readonly string Name;
+            [JsonProperty("Description")] public readonly string Description;
+            [JsonProperty("ManaCost")] public readonly int ManaCost;
+
+            [JsonProperty("LuaCode")] private readonly string _luaCode; 
+            [JsonIgnore] private Func<Entity, List<Entity>, SpellResult> _action;
+
+            public Func<Entity, List<Entity>, SpellResult> Action => _action;
 
             public Spell(string name, string description, Func<Entity, List<Entity>, SpellResult> action, int manaCost)
             {
                 Name = name;
                 Description = description;
-                Action = action;
+                _action = action;
                 ManaCost = manaCost;
             }
 
@@ -31,32 +37,28 @@ namespace RPG.Entities
             {
                 Name = name;
                 Description = description;
-                Action = (caster, opponents) =>
-                {
-                    SpellResult result = new SpellResult($"{caster.Name} casted {name}", SpellResultType.Ok);
-
-                    using (var lua = new Lua())
-                    {
-                        lua[nameof(caster)] = caster;
-
-                        lua[nameof(opponents)] = opponents;
-                        lua[nameof(SpellResultType)] = typeof(SpellResultType);
-                        lua[nameof(result)] = result;
-
-                        lua.DoString(luaAction);
-                    }
-
-                    return result;
-                };
+                _luaCode = luaAction;
                 ManaCost = manaCost;
+
+                Init();
+            }
+
+            public void Init()
+            {
+                if(string.IsNullOrEmpty(_luaCode))
+                {
+                    return;
+                }
+
+                _action = LuaExtensions.GetLuaSpellAction(_luaCode, Name);
             }
 
             public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack.", (caster, opponents) =>
             {
                 List<Attack> attacks = new List<Attack>();
-                foreach(var oppnent in opponents)
+                foreach(var opponent in opponents)
                 {
-                    attacks.Add(new Attack(caster, oppnent, 0.4f));
+                    attacks.Add(new Attack(caster, opponent, 0.4f));
                 }
 
                 return new SpellResult($"{caster.Name} cleaved {string.Join(", ",attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})" ))}.", SpellResultType.Ok);
@@ -77,11 +79,13 @@ namespace RPG.Entities
                         result.Description = caster.Name .. "" applied heal.""
                         result.ResultType = SpellResultType.Ok
                         
-                        for i = 0, opponents.Count - 1 do
-                            opponents[i]:TryTakeDamage(100)
-                        end
+                        --for i = 0, opponents.Count - 1 do
+                        --    opponents[i]:TryTakeDamage(100)
+                        --    attack = Attack(caster, opponents[i], 1.4)
+                        --end
 
-                        caster:Heal(200)
+                        effect = Effect(6, 10, 3, caster)
+                        caster:ApplyEffect(effect)
                     ", 25);
 
             public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}";
@@ -113,7 +117,7 @@ namespace RPG.Entities
 
         public int SlotsCount => _spellSlots.Length;
 
-        public List<Spell> EquipedSpells => _spellSlots.ToList();
+        public List<Spell> EquippedSpells => _spellSlots.ToList();
         public List<(Spell, bool)> Spells => _spells.Select(x => x.Value).ToList();
 
         public EntityActions(int maxSpells, List<Spell> availableSpells = null) 
@@ -148,13 +152,13 @@ namespace RPG.Entities
             _spellSlots[slotIndex] = spell;
         }
 
-        public SpellResult CastSpell(int slotIndex, Entity caster, List<Entity> oponents) => CastSpell(_spellSlots[slotIndex], caster, oponents);
+        public SpellResult CastSpell(int slotIndex, Entity caster, List<Entity> opponents) => CastSpell(_spellSlots[slotIndex], caster, opponents);
 
-        private SpellResult CastSpell(Spell spell, Entity caster, List<Entity> oponents)
+        private SpellResult CastSpell(Spell spell, Entity caster, List<Entity> opponents)
         {
             if(caster.TryTakeMana(spell.ManaCost))
             {
-                return spell.Action(caster, oponents);
+                return spell.Action(caster, opponents);
             }
 
             return new SpellResult($"Not enough mana for {spell.Name}!", SpellResultType.NotEnoughMana);

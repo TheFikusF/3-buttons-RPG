@@ -42,11 +42,11 @@ namespace RPG.Entities
         }
 
 
-        public override bool TryTakeDamage(int amount)
+        public override bool TryTakeDamage(int amount, Entity? attacker)
         {
             amount = GetMultipliedValue(amount, EffectType.InDamageAmp);
 
-            var result = base.TryTakeDamage(amount);
+            var result = base.TryTakeDamage(amount, attacker);
 
             if(result)
             {

@@ -16,7 +16,6 @@ namespace RPG.Data
 
         public Attack(Entity attacker, Entity target, float multiplier = 1)
         {
-
             Attacker = attacker;
             Target = target;
 
@@ -31,12 +30,11 @@ namespace RPG.Data
 
             if(!(Missed || Evaded) || Crit)
             {
-                Killed = target.TryTakeDamage((int)(damage * multiplier));
+                Killed = target.TryTakeDamage((int)(damage * multiplier), attacker);
             }
 
             Amount -= target.Health.Value;
         }
-
 
         public override string ToString()
         {

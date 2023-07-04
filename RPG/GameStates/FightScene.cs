@@ -17,8 +17,8 @@ namespace RPG.GameStates
             _turnLog = new List<string>();
 
             Button1Title = "Attack";
-            Button2Title = $"{Player.Actions.EquipedSpells.First().Name}";
-            Button3Title = $"{Player.Actions.EquipedSpells[1].Name}";
+            Button2Title = $"{Player.Actions.EquippedSpells.First().Name}";
+            Button3Title = $"{Player.Actions.EquippedSpells[1].Name}";
         }
 
         public override string GetStateText()
