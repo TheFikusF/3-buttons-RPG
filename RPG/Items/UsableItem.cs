@@ -1,27 +1,18 @@
 ﻿using Newtonsoft.Json;
 using RPG.Entities;
 using RPG.Utils;
+using static RPG.Utils.Extensions;
 
 namespace RPG.Items
 {
     [Serializable]
     public class UsableItem : Item
     {
-        public class ItemUseResult
-        {
-            public readonly string Description;
-
-            public ItemUseResult(string description)
-            {
-                Description = description;
-            }
-        }
-
         [JsonProperty("LuaCode")] private string _luaCode;
 
-        [JsonIgnore] private Func<Entity, List<Entity>, ItemUseResult> _useCallback;
+        [JsonIgnore] private FightAction<ItemUseResult> _useCallback;
 
-        public UsableItem(string name, Func<Entity, List<Entity>, ItemUseResult> useCallback) : base(name)
+        public UsableItem(string name, FightAction<ItemUseResult> useCallback) : base(name)
         {
             _useCallback = useCallback;
         }

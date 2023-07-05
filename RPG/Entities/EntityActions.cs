@@ -1,8 +1,8 @@
-﻿using NLua;
-using RPG.Data;
+﻿using RPG.Data;
 using RPG.GameStates;
 using Newtonsoft.Json;
 using RPG.Utils;
+using static RPG.Utils.Extensions;
 
 namespace RPG.Entities
 {
@@ -21,11 +21,11 @@ namespace RPG.Entities
             [JsonProperty("ManaCost")] public readonly int ManaCost;
 
             [JsonProperty("LuaCode")] private readonly string _luaCode; 
-            [JsonIgnore] private Func<Entity, List<Entity>, SpellResult> _action;
+            [JsonIgnore] private FightAction<SpellResult> _action;
 
-            public Func<Entity, List<Entity>, SpellResult> Action => _action;
+            public FightAction<SpellResult> Action => _action;
 
-            public Spell(string name, string description, Func<Entity, List<Entity>, SpellResult> action, int manaCost)
+            public Spell(string name, string description, FightAction<SpellResult> action, int manaCost)
             {
                 Name = name;
                 Description = description;

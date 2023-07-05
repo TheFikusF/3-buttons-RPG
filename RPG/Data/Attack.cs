@@ -4,7 +4,7 @@ using RPG.Utils;
 
 namespace RPG.Data
 {
-    internal struct Attack
+    public struct Attack
     {
         public readonly Entity Attacker;
         public readonly Entity Target;
