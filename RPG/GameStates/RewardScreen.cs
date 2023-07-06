@@ -107,7 +107,7 @@ namespace RPG.GameStates
 
         private GameState GetNextState()
         {
-            bool got = _items.TryDequeue(out Item item) && (item is InventoryItem);
+            bool got = _items.TryDequeue(out Item item) && (item is InventoryItem inventoryItem);
             if(got)
             {
                 _currentItem = item as InventoryItem;

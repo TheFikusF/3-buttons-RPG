@@ -49,6 +49,7 @@ namespace RPG.Items
         public int InventorySize => _inventory.Count;
         public int SlotsCount => _slots.Count;
         public List<Item> Items => _inventory.ToList();
+        public List<InventoryItem> EquipedItems => _slots.GroupBy(x => x.Item).Select(x => x.First().Item).Where(x => x is not null).ToList();
 
         public Inventory(IEnumerable<SlotType> slot)
         {

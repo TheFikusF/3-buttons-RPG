@@ -1,0 +1,2 @@
+﻿making FightContext class to pass to item/spell callbacks
+making separate class for this callbacks to remove code repeating

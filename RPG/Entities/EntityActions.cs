@@ -158,7 +158,13 @@ namespace RPG.Entities
         {
             if(caster.TryTakeMana(spell.ManaCost))
             {
-                return spell.Action(caster, opponents);
+                var result = spell.Action(caster, opponents);
+                foreach(var inventoryItem in caster.Inventory.EquipedItems)
+                {
+                    inventoryItem.OnUserCastSpell(caster, opponents, spell, result);
+                }
+
+                return result;
             }
 
             return new SpellResult($"Not enough mana for {spell.Name}!", SpellResultType.NotEnoughMana);

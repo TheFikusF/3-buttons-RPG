@@ -4,6 +4,7 @@ using RPG.Data;
 using RPG.Entities;
 using RPG.Utils;
 using System.Runtime.Serialization;
+using static RPG.Entities.EntityActions;
 using static RPG.Utils.Extensions;
 
 namespace RPG.Items
@@ -141,6 +142,26 @@ namespace RPG.Items
             {
                 _onWearerItemUsed = LuaExtensions.GetLuaItemOnItemUse(_wearerItemUsedLuaCode, Name);
             }
+        }
+
+        public ItemUseResult OnUserTakeDamage(Entity user, List<Entity> opponents)
+        {
+            return _onWearerDamaged?.Invoke(user, opponents);
+        }
+
+        public ItemUseResult OnUserAttack(Entity user, List<Entity> opponents, Attack attack)
+        {
+            return _onWearerAttack?.Invoke(user, opponents, attack);
+        }
+
+        public ItemUseResult OnUserCastSpell(Entity user, List<Entity> opponents, Spell spell, SpellResult spellResult)
+        {
+            return _onWearerCastSpell?.Invoke(user, opponents, spell, spellResult);
+        }
+
+        public ItemUseResult OnUserItemUsed(Entity user, List<Entity> opponents, ItemUseResult result)
+        {
+            return _onWearerItemUsed?.Invoke(user, opponents, result);
         }
 
         public override string ToString() => Name;

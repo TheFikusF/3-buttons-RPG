@@ -34,6 +34,11 @@ namespace RPG.Data
             }
 
             Amount -= target.Health.Value;
+
+            foreach(var inventoryItem in attacker.Inventory.EquipedItems)
+            {
+                inventoryItem.OnUserAttack(attacker, new List<Entity> { target }, this);
+            }
         }
 
         public override string ToString()
