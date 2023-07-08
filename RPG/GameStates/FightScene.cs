@@ -56,7 +56,17 @@ namespace RPG.GameStates
 
             if (CheckCanMove(Player))
             {
-                _turnLog.Add(new Attack(Player, _enemies.First(x => x.Health.Value > 0)).ToString());
+                Enemy enemy = _enemies.First(x => x.Health.Value > 0);
+                Attack attack = new Attack(Player, enemy);
+                _turnLog.Add(attack.ToString());
+
+                _turnLog.AddRange(Player.Inventory.InvokeCallback(x => x.WearerAttacked, new FightContext()
+                {
+                    Actor = Player,
+                    Target = enemy,
+                    Opponents = _enemies.Cast<Entity>().ToList(),
+                    Attack = attack,
+                }).Select(x => x.Description));
             }
             
             AddToTurnLog(Player.TakeEffectsTurn());

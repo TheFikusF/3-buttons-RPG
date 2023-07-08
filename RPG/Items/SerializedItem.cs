@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using RPG.Utils;
+using Terminal.Gui;
 
 namespace RPG.Items.Serialization
 {
@@ -8,7 +10,7 @@ namespace RPG.Items.Serialization
         [JsonIgnore] private static ItemsRepository _instance;
 
         [JsonProperty("Enemies")] private Dictionary<string, List<InventoryItem>> _items;
-        [JsonIgnore] public static Dictionary<string, List<InventoryItem>> Items => _instance._items.ToDictionary(x => x.Key, x => x.Value);
+        [JsonIgnore] private static Dictionary<string, List<InventoryItem>> Items => _instance._items.ToDictionary(x => x.Key, x => x.Value);
 
         public ItemsRepository()
         {
@@ -33,12 +35,17 @@ namespace RPG.Items.Serialization
             {
                 if(key.Name == name)
                 {
-                    item = key;
+                    item = new InventoryItem(key);
                     return true;
                 }
             }
 
             return false;
+        }
+
+        public static InventoryItem GetRandom() 
+        {
+            return new InventoryItem(Items.SelectMany(x => x.Value).ToList().PickRandom());
         }
     }
 }

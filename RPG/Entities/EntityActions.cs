@@ -159,10 +159,6 @@ namespace RPG.Entities
             if(caster.TryTakeMana(spell.ManaCost))
             {
                 var result = spell.Action(caster, opponents);
-                foreach(var inventoryItem in caster.Inventory.EquipedItems)
-                {
-                    inventoryItem.OnUserCastSpell(caster, opponents, spell, result);
-                }
 
                 return result;
             }

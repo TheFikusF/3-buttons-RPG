@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using RPG.Data;
+using System.Text.RegularExpressions;
 
 namespace RPG.Items
 {
@@ -150,6 +151,11 @@ namespace RPG.Items
             }
 
             _inventory.Add(item);
+        }
+
+        public List<ItemUseResult> InvokeCallback(Func<InventoryItem, FightContextAction<ItemUseResult>> action, FightContext context)
+        {
+            return EquipedItems.Select(x => action(x)?.Invoke(context)).Where(x => x is not null).ToList();
         }
 
         public string GetString(int selected)

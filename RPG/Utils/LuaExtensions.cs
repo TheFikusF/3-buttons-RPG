@@ -132,6 +132,29 @@ namespace RPG.Utils
             };
         }
 
+        public static Func<FightContext, T> GetLuaAction<T>(string luaCode) where T : new()
+        {
+            return (context) =>
+            {
+                T result = new T();
+
+                using (var lua = new Lua())
+                {
+                    lua[nameof(context)] = context;
+                    lua[nameof(EffectType)] = typeof(EffectType);
+
+                    lua.RegisterFunction(nameof(Attack), _attackConstructor);
+                    lua.RegisterFunction(nameof(Effect), _effectConstructor);
+
+                    lua[nameof(result)] = result;
+
+                    lua.DoString(luaCode);
+                }
+
+                return result;
+            };
+        }
+
         public static void BasicInit(this Lua lua, Entity user, List<Entity> opponents, string userName = "user")
         {
             lua[userName] = user;

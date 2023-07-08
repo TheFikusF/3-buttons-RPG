@@ -49,7 +49,7 @@ namespace RPG.Entities.NPCSpecializations
 
             for(int i = 0; i < Extensions.GetRandom(_minSellItem, _maxSellItem); i++)
             {
-                InventoryItem item = ItemsRepository.Items.ToList().PickRandom().Value.PickRandom();
+                InventoryItem item = ItemsRepository.GetRandom();
                 _itemsToSell.Add(new SellableItem(item, (int)((item.Defence + item.Attack + item.Health) * 1.5f)));
             }
         }

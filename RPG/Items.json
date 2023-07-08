@@ -1,29 +1,47 @@
 {
-    "Enemies":
-    {
-        "Default":
-        [
-            {
-                "Name":"Zweihander",
-                "InventorySlots":["Hand", "Hand"],
-                "Attack": 10,
-                "Defence": 0,
-                "Health": 0
-            },
-            {
-                "Name":"Helmet",
-                "InventorySlots":["Head"],
-                "Attack": 0,
-                "Defence": 10,
-                "Health": 0
-            },
-            {
-                "Name":"Dagger",
-                "InventorySlots":["Hand"],
-                "Attack": 5,
-                "Defence": 0,
-                "Health": 0
-            }
-        ]
-    }
+  "Enemies": {
+    "Default": [
+      {
+        "Name": "Zweihander",
+        "InventorySlots": [ "Hand", "Hand" ],
+        "Attack": 10,
+        "Defence": 0,
+        "Health": 0
+      },
+      {
+        "Name": "Helmet",
+        "InventorySlots": [ "Head" ],
+        "Attack": 0,
+        "Defence": 10,
+        "Health": 0
+      },
+      {
+        "Name": "Dagger",
+        "InventorySlots": [ "Hand" ],
+        "Attack": 5,
+        "Defence": 0,
+        "Health": 0
+      },
+      {
+        "Name": "Vampire dagger",
+        "Description": "It sucks blood from your enemies.",
+        "Attack": 5,
+        "Defence": 0,
+        "Health": 0,
+        "InventorySlots": [ "Hand" ],
+        "WearerDamaged": {
+          "LuaCode": ""
+        },
+        "WearerAttacked": {
+          "LuaCode": "context.Actor:Heal(10)\nresult.Description = context.Actor.Name .. \" lifestealed 10 hp\""
+        },
+        "WearerCastedSpell": {
+          "LuaCode": ""
+        },
+        "WearerItemUsed": {
+          "LuaCode": ""
+        }
+      }
+    ]
+  }
 }

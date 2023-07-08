@@ -174,11 +174,6 @@ namespace RPG.Entities
             _health.Value -= amount - Defence;
             _lastDamageTook = initialHealth - _health.Value;
 
-            foreach(var equipedItem in Inventory.EquipedItems)
-            {
-                equipedItem.OnUserTakeDamage(this, new List<Entity>() { attacker });
-            }
-
             return _health.Value <= 0;
         }
 

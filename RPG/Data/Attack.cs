@@ -4,11 +4,13 @@ using RPG.Utils;
 
 namespace RPG.Data
 {
-    public struct Attack
+    public class Attack
     {
         public readonly Entity Attacker;
         public readonly Entity Target;
+
         public readonly int Amount;
+
         public readonly bool Killed;
         public readonly bool Missed;
         public readonly bool Evaded;
@@ -35,10 +37,6 @@ namespace RPG.Data
 
             Amount -= target.Health.Value;
 
-            foreach(var inventoryItem in attacker.Inventory.EquipedItems)
-            {
-                inventoryItem.OnUserAttack(attacker, new List<Entity> { target }, this);
-            }
         }
 
         public override string ToString()

@@ -46,7 +46,7 @@ namespace RPG.GameStates
 
             builder.Append($"Gold: {_gold}");
             builder.Append(Environment.NewLine);
-            builder.Append($"Experience: {_experience}" + (_levelUp ? " LEVEL UP!" : ""));
+            builder.Append($"Experience: {_experience}" + (_levelUp ? $"{Environment.NewLine + Environment.NewLine} LEVEL UP!" : ""));
 
             return builder.ToString();
         }

@@ -17,7 +17,7 @@ namespace RPG.GameStates
 
         public override string GetStateText()
         {
-            return "Level Up! What would you like to upgrade?" + Environment.NewLine + Environment.NewLine + Player.Stats.ToString();
+            return $"Level {Player.Level}! What would you like to upgrade?" + Environment.NewLine + Environment.NewLine + Player.Stats.ToString();
         }
 
         public override GameState Button1() => UpgradeStat(StatType.Agility);

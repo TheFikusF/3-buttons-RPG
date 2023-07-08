@@ -39,15 +39,10 @@ namespace RPG.Items
         [JsonProperty("Health")] private int _health;
         [JsonProperty("InventorySlots")] private List<SlotType> _slots;
 
-        [JsonProperty("WearerDamagedLuaCode")] private readonly string _wearerDamagedLuaCode;
-        [JsonProperty("WearerAttackedLuaCode")] private readonly string _wearerAttackedLuaCode;
-        [JsonProperty("WearerCastedSpellLuaCode")] private readonly string _wearerCastedSpellLuaCode;
-        [JsonProperty("WearerItemUsedLuaCode")] private readonly string _wearerItemUsedLuaCode;
-
-        [JsonIgnore] private FightAction<ItemUseResult> _onWearerDamaged;
-        [JsonIgnore] private FightAction<ItemUseResult, Attack> _onWearerAttack;
-        [JsonIgnore] private FightAction<ItemUseResult, EntityActions.Spell, EntityActions.SpellResult> _onWearerCastSpell;
-        [JsonIgnore] private FightAction<ItemUseResult, ItemUseResult> _onWearerItemUsed;
+        [JsonProperty("WearerDamaged")]      public readonly FightContextAction<ItemUseResult> WearerDamaged;
+        [JsonProperty("WearerAttacked")]     public readonly FightContextAction<ItemUseResult> WearerAttacked;
+        [JsonProperty("WearerCastedSpell")]  public readonly FightContextAction<ItemUseResult> WearerCastedSpell;
+        [JsonProperty("WearerItemUsed")]     public readonly FightContextAction<ItemUseResult> WearerItemUsed;
 
         [JsonIgnore] public int Attack => _attack;
         [JsonIgnore] public int Defence => _defence;
@@ -72,16 +67,16 @@ namespace RPG.Items
             int attack = 0,
             int defence = 0,
             int health = 0,
-            FightAction<ItemUseResult> onWearerDamaged = null,
-            FightAction<ItemUseResult, Attack> onWearerAttack = null,
-            FightAction<ItemUseResult, EntityActions.Spell, EntityActions.SpellResult> onWearerCastSpell = null,
-            FightAction<ItemUseResult, ItemUseResult> onWearerItemUsed = null) 
+            Func<FightContext, ItemUseResult> onWearerDamaged = null, 
+            Func<FightContext, ItemUseResult> onWearerAttacked = null, 
+            Func<FightContext, ItemUseResult> onWearerCastSpell = null,
+            Func<FightContext, ItemUseResult> onWearerItemUsed = null) 
             : this(name, slots, attack, defence, health)
         {
-            _onWearerDamaged = onWearerDamaged;
-            _onWearerAttack = onWearerAttack;
-            _onWearerCastSpell = onWearerCastSpell;
-            _onWearerItemUsed = onWearerItemUsed;
+            WearerDamaged = new FightContextAction<ItemUseResult>(onWearerDamaged);
+            WearerAttacked = new FightContextAction<ItemUseResult>(onWearerAttacked);
+            WearerCastedSpell = new FightContextAction<ItemUseResult>(onWearerCastSpell);
+            WearerItemUsed = new FightContextAction<ItemUseResult>(onWearerItemUsed);
         }
 
         private InventoryItem(string name,
@@ -95,12 +90,10 @@ namespace RPG.Items
             string onWearerItemUsed = null)
             : this(name, slots, attack, defence, health)
         {
-            _wearerDamagedLuaCode = onWearerDamaged;
-            _wearerAttackedLuaCode = onWearerAttack;
-            _wearerCastedSpellLuaCode = onWearerCastSpell;
-            _wearerItemUsedLuaCode = onWearerItemUsed;
-
-            Init();
+            WearerDamaged = new FightContextAction<ItemUseResult>(onWearerDamaged);
+            WearerAttacked = new FightContextAction<ItemUseResult>(onWearerAttack);
+            WearerCastedSpell = new FightContextAction<ItemUseResult>(onWearerCastSpell);
+            WearerItemUsed = new FightContextAction<ItemUseResult>(onWearerItemUsed);
         }
 
         public InventoryItem(InventoryItem item) : base(item.Name)
@@ -110,58 +103,10 @@ namespace RPG.Items
             _health = item.Health;
             _slots = item.Slots;
 
-            _onWearerDamaged = item._onWearerDamaged;
-            _onWearerAttack = item._onWearerAttack;
-            _onWearerCastSpell = item._onWearerCastSpell;
-            _onWearerItemUsed = item._onWearerItemUsed;
-
-            _wearerDamagedLuaCode = item._wearerDamagedLuaCode;
-            _wearerAttackedLuaCode = item._wearerAttackedLuaCode;
-            _wearerCastedSpellLuaCode = item._wearerCastedSpellLuaCode;
-            _wearerItemUsedLuaCode = item._wearerItemUsedLuaCode;
-        }
-
-        public void Init()
-        {
-            if(!string.IsNullOrEmpty(_wearerDamagedLuaCode))
-            {
-                _onWearerDamaged = LuaExtensions.GetLuaItemOnDamage(_wearerDamagedLuaCode, Name);
-            }
-
-            if (!string.IsNullOrEmpty(_wearerAttackedLuaCode))
-            {
-                _onWearerAttack = LuaExtensions.GetLuaItemOnAttack(_wearerAttackedLuaCode, Name);
-            }
-
-            if (!string.IsNullOrEmpty(_wearerCastedSpellLuaCode))
-            {
-                _onWearerCastSpell = LuaExtensions.GetLuaItemOnSpellUse(_wearerCastedSpellLuaCode, Name);
-            }
-
-            if (!string.IsNullOrEmpty(_wearerItemUsedLuaCode))
-            {
-                _onWearerItemUsed = LuaExtensions.GetLuaItemOnItemUse(_wearerItemUsedLuaCode, Name);
-            }
-        }
-
-        public ItemUseResult OnUserTakeDamage(Entity user, List<Entity> opponents)
-        {
-            return _onWearerDamaged?.Invoke(user, opponents);
-        }
-
-        public ItemUseResult OnUserAttack(Entity user, List<Entity> opponents, Attack attack)
-        {
-            return _onWearerAttack?.Invoke(user, opponents, attack);
-        }
-
-        public ItemUseResult OnUserCastSpell(Entity user, List<Entity> opponents, Spell spell, SpellResult spellResult)
-        {
-            return _onWearerCastSpell?.Invoke(user, opponents, spell, spellResult);
-        }
-
-        public ItemUseResult OnUserItemUsed(Entity user, List<Entity> opponents, ItemUseResult result)
-        {
-            return _onWearerItemUsed?.Invoke(user, opponents, result);
+            WearerDamaged = item.WearerDamaged;
+            WearerAttacked = item.WearerAttacked;
+            WearerCastedSpell = item.WearerCastedSpell;
+            WearerItemUsed = item.WearerItemUsed;
         }
 
         public override string ToString() => Name;

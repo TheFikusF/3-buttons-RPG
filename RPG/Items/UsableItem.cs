@@ -1,42 +1,21 @@
 ﻿using Newtonsoft.Json;
-using RPG.Entities;
-using RPG.Utils;
-using static RPG.Utils.Extensions;
+using RPG.Data;
 
 namespace RPG.Items
 {
     [Serializable]
     public class UsableItem : Item
     {
-        [JsonProperty("LuaCode")] private string _luaCode;
+        [JsonProperty("UseCallback")] private FightContextAction<ItemUseResult> _useCallback;
 
-        [JsonIgnore] private FightAction<ItemUseResult> _useCallback;
-
-        public UsableItem(string name, FightAction<ItemUseResult> useCallback) : base(name)
+        public UsableItem(string name, Func<FightContext, ItemUseResult> useCallback = null) : base(name)
         {
-            _useCallback = useCallback;
+            _useCallback = new FightContextAction<ItemUseResult>(useCallback);
         }
 
         public UsableItem(string name, string luaCode) : base(name)
         {
-            _luaCode = luaCode;
-
-            Init();
-        }
-
-        public void Init()
-        {
-            if(string.IsNullOrEmpty(_luaCode))
-            {
-                return;
-            }
-
-            _useCallback = LuaExtensions.GetLuaItemAction(_luaCode, Name);        
-        }
-
-        public ItemUseResult UseItem(Entity user, List<Entity> opponents)
-        {
-            return _useCallback?.Invoke(user, opponents) ?? throw new NullReferenceException("The action was empty");
+            _useCallback = new FightContextAction<ItemUseResult>(luaCode);
         }
 
         public override string GetFullString()
