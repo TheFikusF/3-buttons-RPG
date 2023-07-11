@@ -41,19 +41,16 @@ namespace RPG.Entities
             base.Heal(amount);
         }
 
-
-        public override bool TryTakeDamage(int amount, Entity? attacker)
+        public override void TakeDamage(int amount, Entity? attacker)
         {
             amount = GetMultipliedValue(amount, EffectType.InDamageAmp);
 
-            var result = base.TryTakeDamage(amount, attacker);
+            base.TakeDamage(amount, attacker);
 
-            if(result)
+            if(!Alive)
             {
                 Effects.Clear();
             }
-
-            return result;
         }
 
         public List<string> TakeEffectsTurn()

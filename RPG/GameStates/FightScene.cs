@@ -60,13 +60,25 @@ namespace RPG.GameStates
                 Attack attack = new Attack(Player, enemy);
                 _turnLog.Add(attack.ToString());
 
-                _turnLog.AddRange(Player.Inventory.InvokeCallback(x => x.WearerAttacked, new FightContext()
+                if(attack.Succes)
                 {
-                    Actor = Player,
-                    Target = enemy,
-                    Opponents = _enemies.Cast<Entity>().ToList(),
-                    Attack = attack,
-                }).Select(x => x.Description));
+                    _turnLog.AddRange(Player.Inventory.InvokeCallback(x => x.WearerAttacked, new FightContext()
+                    {
+                        Actor = Player,
+                        Target = enemy,
+                        Opponents = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
+                        Attack = attack,
+                    }).Select(x => x.Description));
+
+                    _turnLog.AddRange(enemy.Inventory.InvokeCallback(x => x.WearerDamaged, new FightContext()
+                    {
+                        Actor = enemy,
+                        Target = Player,
+                        Allies = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
+                        Attack = attack,
+                    }).Select(x => x.Description));
+                }
+
             }
             
             AddToTurnLog(Player.TakeEffectsTurn());
@@ -134,11 +146,36 @@ namespace RPG.GameStates
 
                 if(CheckCanMove(enemy))
                 {
-                    _turnLog.Add(new Attack(enemy, Player).ToString());
+                    EnemyPerformAttack(enemy);
                 }
 
                 AddToTurnLog(enemy.TakeEffectsTurn());
                 _turnLog.Add(string.Empty);
+            }
+        }
+
+        private void EnemyPerformAttack(Enemy enemy)
+        {
+            var attack = new Attack(enemy, Player);
+            _turnLog.Add(attack.ToString());
+
+            if (attack.Succes)
+            {
+                _turnLog.AddRange(enemy.Inventory.InvokeCallback(x => x.WearerAttacked, new FightContext()
+                {
+                    Actor = enemy,
+                    Target = Player,
+                    Allies = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
+                    Attack = attack,
+                }).Select(x => x.Description));
+
+                _turnLog.AddRange(Player.Inventory.InvokeCallback(x => x.WearerDamaged, new FightContext()
+                {
+                    Actor = Player,
+                    Target = enemy,
+                    Opponents = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
+                    Attack = attack,
+                }).Select(x => x.Description));
             }
         }
 

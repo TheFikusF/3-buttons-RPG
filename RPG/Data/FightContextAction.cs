@@ -3,7 +3,6 @@ using RPG.Utils;
 
 namespace RPG.Data
 {
-    //[JsonConverter(typeof(FightContextActionSerializer<>))]
     public class FightContextAction<T> where T : class, new()
     {
         [JsonProperty("LuaCode")] private string _luaCode;

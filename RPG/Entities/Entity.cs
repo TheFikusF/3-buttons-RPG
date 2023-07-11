@@ -57,6 +57,8 @@ namespace RPG.Entities
 
         public int LastDamageTook => _lastDamageTook;
 
+        public bool Alive => Health.Value > 0;
+
         public Entity(string name, int maxHealth, 
             Inventory inventory, 
             EntityStats stats,
@@ -168,13 +170,11 @@ namespace RPG.Entities
             return true;
         }
 
-        public virtual bool TryTakeDamage(int amount, Entity? attacker)
+        public virtual void TakeDamage(int amount, Entity? attacker)
         {
             var initialHealth = _health.Value;
             _health.Value -= amount - Defence;
             _lastDamageTook = initialHealth - _health.Value;
-
-            return _health.Value <= 0;
         }
 
         public virtual void Heal(int amount)

@@ -103,7 +103,7 @@ namespace RPG.Data
 
             GameState Trap()
             {
-                player.TryTakeDamage(10, null);
+                player.TakeDamage(10, null);
                 return currentState;
             }
 

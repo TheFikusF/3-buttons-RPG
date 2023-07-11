@@ -10,7 +10,7 @@ namespace RPG.Utils
 {
     public static class LuaExtensions
     {
-        private static readonly MethodBase _attackConstructor = typeof(Attack).GetConstructor(new Type[] { typeof(Entity), typeof(Entity), typeof(float) });
+        private static readonly MethodBase _attackConstructor = typeof(Attack).GetConstructor(new Type[] { typeof(FightContext), typeof(float), typeof(bool), typeof(bool) });
         private static readonly MethodBase _effectConstructor = typeof(Effect).GetConstructor(new Type[] { typeof(int), typeof(float), typeof(int), typeof(Entity) });
 
         public static FightAction<SpellResult> GetLuaSpellAction(string luaCode, string spellName)
@@ -25,105 +25,6 @@ namespace RPG.Utils
 
                     lua[nameof(SpellResultType)] = typeof(SpellResultType);
                     lua[nameof(result)] = result;
-
-                    lua.DoString(luaCode);
-                }
-
-                return result;
-            };
-        }
-
-        public static FightAction<ItemUseResult> GetLuaItemAction(string luaCode, string itemName)
-        {
-            return (user, opponents) =>
-            {
-                ItemUseResult result = new ItemUseResult($"{user.Name} used {itemName}");
-
-                using (var lua = new Lua())
-                {
-                    lua.BasicInit(user, opponents, "user");
-
-                    lua[nameof(result)] = result;
-
-                    lua.DoString(luaCode);
-                }
-
-                return result;
-            };
-        }
-
-        public static FightAction<ItemUseResult> GetLuaItemOnDamage(string luaCode, string itemName)
-        {
-            return (user, opponents) =>
-            {
-                ItemUseResult result = new ItemUseResult($"{user.Name} used {itemName}");
-
-                using (var lua = new Lua())
-                {
-                    lua.BasicInit(user, opponents, "user");
-
-                    lua[nameof(result)] = result;
-
-                    lua.DoString(luaCode);
-                }
-
-                return result;
-            };
-        }
-
-        public static FightAction<ItemUseResult, Attack> GetLuaItemOnAttack(string luaCode, string itemName)
-        {
-            return (user, opponents, attack) =>
-            {
-                ItemUseResult result = new ItemUseResult($"{user.Name} used {itemName}");
-
-                using (var lua = new Lua())
-                {
-                    lua.BasicInit(user, opponents, "user");
-
-                    lua[nameof(attack)] = attack;
-                    lua[nameof(result)] = result;
-
-                    lua.DoString(luaCode);
-                }
-
-                return result;
-            };
-        }
-
-        public static FightAction<ItemUseResult, Spell, SpellResult> GetLuaItemOnSpellUse(string luaCode, string itemName)
-        {
-            return (user, opponents, spell, spellResult) =>
-            {
-                ItemUseResult result = new ItemUseResult($"{user.Name} used {itemName}");
-
-                using (var lua = new Lua())
-                {
-                    lua.BasicInit(user, opponents, "user");
-
-                    lua[nameof(result)] = result;
-                    lua[nameof(spell)] = spell;
-                    lua[nameof(spellResult)] = spellResult;
-
-                    lua.DoString(luaCode);
-                }
-
-                return result;
-            };
-        }
-
-        public static FightAction<ItemUseResult, ItemUseResult> GetLuaItemOnItemUse(string luaCode, string itemName)
-        {
-            return (user, opponents, itemUseResult) =>
-            {
-                ItemUseResult result = new ItemUseResult($"{user.Name} used {itemName}");
-
-                using (var lua = new Lua())
-                {
-                    lua.BasicInit(user, opponents, "user");
-
-                    lua[nameof(result)] = result;
-                    lua[nameof(itemUseResult)] = itemUseResult;
 
                     lua.DoString(luaCode);
                 }

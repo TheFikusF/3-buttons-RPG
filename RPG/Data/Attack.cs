@@ -1,10 +1,13 @@
 ﻿using RandN.Distributions;
+using RPG.Data.Services;
 using RPG.Entities;
+using RPG.Fight.ActionResults;
+using RPG.Items;
 using RPG.Utils;
 
 namespace RPG.Data
 {
-    public class Attack
+    public class Attack : IActionResult
     {
         public readonly Entity Attacker;
         public readonly Entity Target;
@@ -16,27 +19,43 @@ namespace RPG.Data
         public readonly bool Evaded;
         public readonly bool Crit;
 
-        public Attack(Entity attacker, Entity target, float multiplier = 1)
+        public List<ItemUseResult> ItemUseResults { get; private init; }
+
+        public bool Succes => !(Missed || Evaded) || Crit;
+
+        public Attack(FightContext context, float multiplier = 1, bool attackersCallbacks = true, bool targetCallbacks = true)
         {
-            Attacker = attacker;
-            Target = target;
+            Attacker = context.Actor;
+            Target = context.Target;
 
-            Amount = target.Health.Value;
+            Amount = Target.Health.Value;
 
-            Crit = Bernoulli.FromRatio((uint)attacker.CritChance, 100).Sample(Extensions.RNG);
-            Missed = !Bernoulli.FromRatio((uint)attacker.HitChance, 100).Sample(Extensions.RNG);
-            Evaded = Bernoulli.FromRatio((uint)target.Evasion, 100).Sample(Extensions.RNG);
+            Crit = Bernoulli.FromRatio((uint)Attacker.CritChance, 100).Sample(Extensions.RNG);
+            Missed = !Bernoulli.FromRatio((uint)Attacker.HitChance, 100).Sample(Extensions.RNG);
+            Evaded = Bernoulli.FromRatio((uint)Target.Evasion, 100).Sample(Extensions.RNG);
 
-            int damage = Crit ? (int)(attacker.Attack * attacker.CritMultiplier) : attacker.Attack;
+            int damage = Crit ? (int)(Attacker.Attack * Attacker.CritMultiplier) : Attacker.Attack;
             damage = !Crit && (Missed || Evaded) ? 0 : damage;
 
-            if(!(Missed || Evaded) || Crit)
+            if(Succes)
             {
-                Killed = target.TryTakeDamage((int)(damage * multiplier), attacker);
+                Target.TakeDamage((int)(damage * multiplier), Attacker);
             }
 
-            Amount -= target.Health.Value;
+            ItemUseResults = new List<ItemUseResult>();
+            Amount -= Target.Health.Value;
 
+            context.Attack = this;
+
+            if(attackersCallbacks)
+            {
+                ItemUseResults.AddRange(Attacker.Inventory.InvokeCallback(x => x.WearerAttacked, context));
+            }
+
+            if(targetCallbacks)
+            {
+                ItemUseResults.AddRange(Target.Inventory.InvokeCallback(x => x.WearerDamaged, FightContextService.Flip(context)));
+            }
         }
 
         public override string ToString()

@@ -1,2 +1,5 @@
-﻿making FightContext class to pass to item/spell callbacks
-making separate class for this callbacks to remove code repeating
+﻿+ making FightContext class to pass to item/spell callbacks
++ making separate class for this callbacks to remove code repeating
+create fight class to store info about current fight amd remove logic from fightscene
+create nested ItemUseResult list in ItemUseResult
+make TakeDamage function and Spell action function to take FightContext and return ItemUseResult

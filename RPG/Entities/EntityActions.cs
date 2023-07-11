@@ -3,6 +3,8 @@ using RPG.GameStates;
 using Newtonsoft.Json;
 using RPG.Utils;
 using static RPG.Utils.Extensions;
+using RPG.Fight.ActionResults;
+using RPG.Items;
 
 namespace RPG.Entities
 {
@@ -98,15 +100,18 @@ namespace RPG.Entities
             }
         }
 
-        public class SpellResult
+        public class SpellResult : IActionResult
         {
             public readonly string Description;
             public readonly SpellResultType ResultType;
+
+            public List<ItemUseResult> ItemUseResults { get; set; }
 
             public SpellResult(string description, SpellResultType resultType)
             {
                 Description = description;
                 ResultType = resultType;
+                ItemUseResults = new List<ItemUseResult>();
             }
 
             public override string ToString() => Description;

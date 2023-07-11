@@ -40,10 +40,10 @@ namespace RPG.Data
             switch (Type)
             {
                 case EffectType.Burn:
-                    entity.TryTakeDamage((int)Value, EffectCaster);
+                    entity.TakeDamage((int)Value, EffectCaster);
                     return $"{entity.Name} took {entity.LastDamageTook} burning!";
                 case EffectType.Poison:
-                    entity.TryTakeDamage((int)Value, EffectCaster);
+                    entity.TakeDamage((int)Value, EffectCaster);
                     return $"{entity.Name} took {entity.LastDamageTook} decaying!";
                 case EffectType.HealOT:
                     entity.Heal((int)Value);

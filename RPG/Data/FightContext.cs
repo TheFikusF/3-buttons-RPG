@@ -6,13 +6,13 @@ namespace RPG.Data
 {
     public struct FightContext
     {
-        public required Entity Actor { get; init; }
-        public List<Entity> Allies { get; init; }
-        public Entity Target { get; init; }
-        public List<Entity> Opponents { get; init; }
-        public Attack Attack { get; init; }
-        public Spell SpellUsed { get; init; }
-        public SpellResult SpellUseResult { get; init; }
-        public ItemUseResult ItemUseResult { get; init; }
+        public required Entity Actor { get; set; }
+        public List<Entity> Allies { get; set; }
+        public Entity Target { get; set; }
+        public List<Entity> Opponents { get; set; }
+        public Attack Attack { get; set; }
+        public Spell SpellUsed { get; set; }
+        public SpellResult SpellUseResult { get; set; }
+        public ItemUseResult ItemUseResult { get; set; }
     }
 }
