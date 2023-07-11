@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
-using RPG.Data;
+﻿using RPG.Data;
 using RPG.Entities;
+using RPG.Fight.ActionResults;
 using System.Text;
 
 namespace RPG.GameStates
@@ -9,12 +9,12 @@ namespace RPG.GameStates
     {
         private int _turn = 0;
         private List<Enemy> _enemies;
-        private List<string> _turnLog;
+        private List<IActionResult> _turnLog;
 
         public FightScene(Player player, List<Enemy> enemies) : base(player)
         {
             _enemies = enemies;
-            _turnLog = new List<string>();
+            _turnLog = new List<IActionResult>();
 
             Button1Title = "Attack";
             Button2Title = $"{Player.Actions.EquippedSpells.First().Name}";
@@ -39,7 +39,7 @@ namespace RPG.GameStates
         public override void ButtonPressStart()
         {
             _turn++;
-            _turnLog = new List<string>();
+            _turnLog = new List<IActionResult>();
         }
 
         public override void ButtonPressEnd()
@@ -57,32 +57,18 @@ namespace RPG.GameStates
             if (CheckCanMove(Player))
             {
                 Enemy enemy = _enemies.First(x => x.Health.Value > 0);
-                Attack attack = new Attack(Player, enemy);
-                _turnLog.Add(attack.ToString());
-
-                if(attack.Succes)
+                Attack attack = new Attack(new FightContext()
                 {
-                    _turnLog.AddRange(Player.Inventory.InvokeCallback(x => x.WearerAttacked, new FightContext()
-                    {
-                        Actor = Player,
-                        Target = enemy,
-                        Opponents = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
-                        Attack = attack,
-                    }).Select(x => x.Description));
+                    Actor = Player,
+                    Target = enemy,
+                    Opponents = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
+                });
 
-                    _turnLog.AddRange(enemy.Inventory.InvokeCallback(x => x.WearerDamaged, new FightContext()
-                    {
-                        Actor = enemy,
-                        Target = Player,
-                        Allies = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
-                        Attack = attack,
-                    }).Select(x => x.Description));
-                }
-
+                _turnLog.Add(attack);
             }
             
             AddToTurnLog(Player.TakeEffectsTurn());
-            _turnLog.Add(string.Empty);
+            //_turnLog.Add(string.Empty);
 
             PerformEnemiesTurn();
 
@@ -121,8 +107,13 @@ namespace RPG.GameStates
         {
             if(CheckCanMove(Player))
             {
-                EntityActions.SpellResult result = Player.CastSpell(slot, _enemies.Where(x => x.Health.Value > 0).Cast<Entity>().ToList());
-                _turnLog.Add(result.Description);
+                EntityActions.SpellResult result = Player.CastSpell(slot, new FightContext()
+                {
+                    Actor = Player,
+                    Opponents = _enemies.Cast<Entity>().ToList(),
+                });
+
+                _turnLog.Add(result);
 
                 if (result.ResultType == EntityActions.SpellResultType.NotEnoughMana)
                 {
@@ -150,33 +141,20 @@ namespace RPG.GameStates
                 }
 
                 AddToTurnLog(enemy.TakeEffectsTurn());
-                _turnLog.Add(string.Empty);
+                //_turnLog.Add(string.Empty);
             }
         }
 
         private void EnemyPerformAttack(Enemy enemy)
         {
-            var attack = new Attack(enemy, Player);
-            _turnLog.Add(attack.ToString());
-
-            if (attack.Succes)
+            var attack = new Attack(new FightContext()
             {
-                _turnLog.AddRange(enemy.Inventory.InvokeCallback(x => x.WearerAttacked, new FightContext()
-                {
-                    Actor = enemy,
-                    Target = Player,
-                    Allies = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
-                    Attack = attack,
-                }).Select(x => x.Description));
+                Actor = enemy,
+                Target = Player,
+                Allies = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
+            });
 
-                _turnLog.AddRange(Player.Inventory.InvokeCallback(x => x.WearerDamaged, new FightContext()
-                {
-                    Actor = Player,
-                    Target = enemy,
-                    Opponents = _enemies.Except(new List<Enemy> { enemy }).Cast<Entity>().ToList(),
-                    Attack = attack,
-                }).Select(x => x.Description));
-            }
+            _turnLog.Add(attack);
         }
 
         private void CheckHealth()
@@ -193,7 +171,7 @@ namespace RPG.GameStates
         {
             if(entity.Stunned)
             {
-                _turnLog.Add($"{entity.Name} is stunned!");
+                //_turnLog.Add($"{entity.Name} is stunned!");
             }
 
             return !entity.Stunned;
@@ -203,7 +181,7 @@ namespace RPG.GameStates
         {
             if (logs.Count > 0)
             {
-                _turnLog.Add(string.Join(Environment.NewLine, logs));
+                //_turnLog.Add(string.Join(Environment.NewLine, logs));
             }
         }
     }

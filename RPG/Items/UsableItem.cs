@@ -6,16 +6,16 @@ namespace RPG.Items
     [Serializable]
     public class UsableItem : Item
     {
-        [JsonProperty("UseCallback")] private FightContextAction<ItemUseResult> _useCallback;
+        [JsonProperty("UseCallback")] private FightAction<ItemUseResult> _useCallback;
 
         public UsableItem(string name, Func<FightContext, ItemUseResult> useCallback = null) : base(name)
         {
-            _useCallback = new FightContextAction<ItemUseResult>(useCallback);
+            _useCallback = new FightAction<ItemUseResult>(useCallback);
         }
 
         public UsableItem(string name, string luaCode) : base(name)
         {
-            _useCallback = new FightContextAction<ItemUseResult>(luaCode);
+            _useCallback = new FightAction<ItemUseResult>(luaCode);
         }
 
         public override string GetFullString()

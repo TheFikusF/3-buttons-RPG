@@ -60,27 +60,16 @@ namespace RPG.Data
 
         public override string ToString()
         {
-            if (Killed)
+            return Amount switch
             {
-                return $"{Attacker.Name} killed {Target.Name}.";
-            }
-
-            if (Crit)
-            {
-                return $"{Attacker.Name} got critical hit on {Target.Name} for {Amount} HP!";
-            }
-
-            if (Evaded)
-            {
-                return $"{Target.Name} evaded {Attacker.Name}'s attack.";
-            }
-
-            if (Missed)
-            {
-                return $"{Attacker.Name} missed the attack on {Target.Name}.";
-            }
-
-            return $"{Attacker.Name} attacked {Target.Name} for {Amount} HP.";
+                _ when Killed => $"{Attacker.Name} killed {Target.Name}.",
+                _ when Crit => $"{Attacker.Name} got critical hit on {Target.Name} for {Amount} HP!",
+                _ when Evaded => $"{Target.Name} evaded {Attacker.Name}'s attack.",
+                _ when Missed => $"{Attacker.Name} missed the attack on {Target.Name}.",
+                _ => $"{Attacker.Name} attacked {Target.Name} for {Amount} HP.",
+            } + (ItemUseResults.Count > 0 
+                ? Environment.NewLine + string.Join(Environment.NewLine, ItemUseResults) 
+                : string.Empty);
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using RPG.Data;
 using RPG.GameStates;
 using Newtonsoft.Json;
-using RPG.Utils;
-using static RPG.Utils.Extensions;
 using RPG.Fight.ActionResults;
 using RPG.Items;
 
@@ -22,16 +20,15 @@ namespace RPG.Entities
             [JsonProperty("Description")] public readonly string Description;
             [JsonProperty("ManaCost")] public readonly int ManaCost;
 
-            [JsonProperty("LuaCode")] private readonly string _luaCode; 
-            [JsonIgnore] private FightAction<SpellResult> _action;
+            [JsonProperty("Action")] private readonly FightAction<SpellResult> _action;
 
             public FightAction<SpellResult> Action => _action;
 
-            public Spell(string name, string description, FightAction<SpellResult> action, int manaCost)
+            public Spell(string name, string description, Func<FightContext, SpellResult> action, int manaCost)
             {
                 Name = name;
                 Description = description;
-                _action = action;
+                _action = new FightAction<SpellResult>(action);
                 ManaCost = manaCost;
             }
 
@@ -39,55 +36,41 @@ namespace RPG.Entities
             {
                 Name = name;
                 Description = description;
-                _luaCode = luaAction;
+                _action = new FightAction<SpellResult>(luaAction);
                 ManaCost = manaCost;
 
-                Init();
             }
 
-            public void Init()
-            {
-                if(string.IsNullOrEmpty(_luaCode))
-                {
-                    return;
-                }
-
-                _action = LuaExtensions.GetLuaSpellAction(_luaCode, Name);
-            }
-
-            public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack.", (caster, opponents) =>
+            public static Spell Cleave() => new Spell("Cleave", "You do a cleave attack.", (context) =>
             {
                 List<Attack> attacks = new List<Attack>();
-                foreach(var opponent in opponents)
+                foreach(var opponent in context.Opponents)
                 {
-                    attacks.Add(new Attack(caster, opponent, 0.4f));
+                    context.Target = opponent;
+                    attacks.Add(new Attack(context, 0.4f, true, true));
                 }
 
-                return new SpellResult($"{caster.Name} cleaved {string.Join(", ",attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})" ))}.", SpellResultType.Ok);
+                return new SpellResult($"{context.Actor.Name} cleaved {string.Join(", ",attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})" ))}.", SpellResultType.Ok);
             }, 10);
 
-            public static Spell ThunderStrike() => new Spell("ThunderStrike", "You strike enemies from the sky.", (caster, opponents) =>
+            public static Spell ThunderStrike() => new Spell("ThunderStrike", "You strike enemies from the sky.", (context) =>
             {
                 List<Attack> attacks = new List<Attack>();
-                foreach (var opponent in opponents)
+                foreach (var opponent in context.Opponents)
                 {
-                    attacks.Add(new Attack(caster, opponent, 1.4f));
+                    context.Target = opponent;
+                    attacks.Add(new Attack(context, 1.4f, false, true));
                 }
 
-                return new SpellResult($"{caster.Name} struck {string.Join(", ", attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})"))}.", SpellResultType.Ok);
+                return new SpellResult($"{context.Actor.Name} struck {string.Join(", ", attacks.Where(x => !x.Missed && !x.Evaded).Select(x => $"{x.Target.Name} (-{x.Amount})"))}.", SpellResultType.Ok);
             }, 25);
 
             public static Spell Heal() => new Spell("Heal", "Heal yourself for 3 rounds for 10 hp.", @"
-                        result.Description = caster.Name .. "" applied heal.""
+                        result.Description = context.Actor.Name .. "" applied heal.""
                         result.ResultType = SpellResultType.Ok
                         
-                        --for i = 0, opponents.Count - 1 do
-                        --    opponents[i]:TryTakeDamage(100)
-                        --    attack = Attack(caster, opponents[i], 1.4)
-                        --end
-
                         effect = Effect(6, 10, 3, caster)
-                        caster:ApplyEffect(effect)
+                        context.Actor:ApplyEffect(effect)
                     ", 25);
 
             public override string ToString() => $"{Name}{$"MP: {ManaCost}".PadLeft(23 - Name.Length)}";
@@ -106,6 +89,13 @@ namespace RPG.Entities
             public readonly SpellResultType ResultType;
 
             public List<ItemUseResult> ItemUseResults { get; set; }
+
+            public SpellResult()
+            {
+                Description = "";
+                ResultType = SpellResultType.Ok;
+                ItemUseResults = new List<ItemUseResult>();
+            }
 
             public SpellResult(string description, SpellResultType resultType)
             {
@@ -157,13 +147,13 @@ namespace RPG.Entities
             _spellSlots[slotIndex] = spell;
         }
 
-        public SpellResult CastSpell(int slotIndex, Entity caster, List<Entity> opponents) => CastSpell(_spellSlots[slotIndex], caster, opponents);
+        public SpellResult CastSpell(int slotIndex, FightContext context) => CastSpell(_spellSlots[slotIndex], context);
 
-        private SpellResult CastSpell(Spell spell, Entity caster, List<Entity> opponents)
+        private SpellResult CastSpell(Spell spell, FightContext context)
         {
-            if(caster.TryTakeMana(spell.ManaCost))
+            if(context.Actor.TryTakeMana(spell.ManaCost))
             {
-                var result = spell.Action(caster, opponents);
+                var result = spell.Action.Invoke(context);
 
                 return result;
             }

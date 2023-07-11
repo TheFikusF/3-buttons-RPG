@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RPG.Data;
-using RPG.Entities;
-using RPG.Utils;
 using System.Runtime.Serialization;
-using static RPG.Entities.EntityActions;
-using static RPG.Utils.Extensions;
 
 namespace RPG.Items
 {
@@ -39,10 +35,10 @@ namespace RPG.Items
         [JsonProperty("Health")] private int _health;
         [JsonProperty("InventorySlots")] private List<SlotType> _slots;
 
-        [JsonProperty("WearerDamaged")]      public readonly FightContextAction<ItemUseResult> WearerDamaged;
-        [JsonProperty("WearerAttacked")]     public readonly FightContextAction<ItemUseResult> WearerAttacked;
-        [JsonProperty("WearerCastedSpell")]  public readonly FightContextAction<ItemUseResult> WearerCastedSpell;
-        [JsonProperty("WearerItemUsed")]     public readonly FightContextAction<ItemUseResult> WearerItemUsed;
+        [JsonProperty("WearerDamaged")]      public readonly FightAction<ItemUseResult> WearerDamaged;
+        [JsonProperty("WearerAttacked")]     public readonly FightAction<ItemUseResult> WearerAttacked;
+        [JsonProperty("WearerCastedSpell")]  public readonly FightAction<ItemUseResult> WearerCastedSpell;
+        [JsonProperty("WearerItemUsed")]     public readonly FightAction<ItemUseResult> WearerItemUsed;
 
         [JsonIgnore] public int Attack => _attack;
         [JsonIgnore] public int Defence => _defence;
@@ -73,10 +69,10 @@ namespace RPG.Items
             Func<FightContext, ItemUseResult> onWearerItemUsed = null) 
             : this(name, slots, attack, defence, health)
         {
-            WearerDamaged = new FightContextAction<ItemUseResult>(onWearerDamaged);
-            WearerAttacked = new FightContextAction<ItemUseResult>(onWearerAttacked);
-            WearerCastedSpell = new FightContextAction<ItemUseResult>(onWearerCastSpell);
-            WearerItemUsed = new FightContextAction<ItemUseResult>(onWearerItemUsed);
+            WearerDamaged = new FightAction<ItemUseResult>(onWearerDamaged);
+            WearerAttacked = new FightAction<ItemUseResult>(onWearerAttacked);
+            WearerCastedSpell = new FightAction<ItemUseResult>(onWearerCastSpell);
+            WearerItemUsed = new FightAction<ItemUseResult>(onWearerItemUsed);
         }
 
         private InventoryItem(string name,
@@ -90,10 +86,10 @@ namespace RPG.Items
             string onWearerItemUsed = null)
             : this(name, slots, attack, defence, health)
         {
-            WearerDamaged = new FightContextAction<ItemUseResult>(onWearerDamaged);
-            WearerAttacked = new FightContextAction<ItemUseResult>(onWearerAttack);
-            WearerCastedSpell = new FightContextAction<ItemUseResult>(onWearerCastSpell);
-            WearerItemUsed = new FightContextAction<ItemUseResult>(onWearerItemUsed);
+            WearerDamaged = new FightAction<ItemUseResult>(onWearerDamaged);
+            WearerAttacked = new FightAction<ItemUseResult>(onWearerAttack);
+            WearerCastedSpell = new FightAction<ItemUseResult>(onWearerCastSpell);
+            WearerItemUsed = new FightAction<ItemUseResult>(onWearerItemUsed);
         }
 
         public InventoryItem(InventoryItem item) : base(item.Name)

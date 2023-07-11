@@ -198,7 +198,7 @@ namespace RPG.Entities
             _mana.Value += amount;
         }
 
-        public EntityActions.SpellResult CastSpell(int slot, List<Entity> entities) => _entityActions.CastSpell(slot, this, entities);
+        public EntityActions.SpellResult CastSpell(int slot, FightContext context) => _entityActions.CastSpell(slot, context);
 
         public override string ToString()
         {

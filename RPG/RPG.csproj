@@ -7,7 +7,7 @@
     <UseWindowsForms>False</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>RPG.Program</StartupObject>
-	<PublishAot>True</PublishAot>
+	<PublishAot>False</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

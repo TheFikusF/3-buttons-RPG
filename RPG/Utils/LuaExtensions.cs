@@ -1,10 +1,8 @@
 ﻿using RPG.Data;
 using RPG.Entities;
 using NLua;
-using RPG.Items;
 using System.Reflection;
 using static RPG.Entities.EntityActions;
-using static RPG.Utils.Extensions;
 
 namespace RPG.Utils
 {
@@ -13,7 +11,7 @@ namespace RPG.Utils
         private static readonly MethodBase _attackConstructor = typeof(Attack).GetConstructor(new Type[] { typeof(FightContext), typeof(float), typeof(bool), typeof(bool) });
         private static readonly MethodBase _effectConstructor = typeof(Effect).GetConstructor(new Type[] { typeof(int), typeof(float), typeof(int), typeof(Entity) });
 
-        public static FightAction<SpellResult> GetLuaSpellAction(string luaCode, string spellName)
+/*        public static FightAction<SpellResult> GetLuaSpellAction(string luaCode, string spellName)
         {
             return (caster, opponents) =>
             {
@@ -31,7 +29,7 @@ namespace RPG.Utils
 
                 return result;
             };
-        }
+        }*/
 
         public static Func<FightContext, T> GetLuaAction<T>(string luaCode) where T : new()
         {

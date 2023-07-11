@@ -3,7 +3,7 @@ using RPG.Utils;
 
 namespace RPG.Data
 {
-    public class FightContextAction<T> where T : class, new()
+    public class FightAction<T> where T : class, new()
     {
         [JsonProperty("LuaCode")] private string _luaCode;
 
@@ -12,17 +12,17 @@ namespace RPG.Data
         private bool _inited;
 
         [JsonConstructor]
-        public FightContextAction()
+        public FightAction()
         {
 
         }
 
-        public FightContextAction(Func<FightContext, T> action) 
+        public FightAction(Func<FightContext, T> action) 
         {
-            _action = action ?? (c => null);
+            _action = action ?? (context => null);
         }
 
-        public FightContextAction(string luaCode)
+        public FightAction(string luaCode)
         {
             _luaCode = luaCode;
 

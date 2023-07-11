@@ -153,7 +153,7 @@ namespace RPG.Items
             _inventory.Add(item);
         }
 
-        public List<ItemUseResult> InvokeCallback(Func<InventoryItem, FightContextAction<ItemUseResult>> action, FightContext context)
+        public List<ItemUseResult> InvokeCallback(Func<InventoryItem, FightAction<ItemUseResult>> action, FightContext context)
         {
             return EquipedItems.Select(x => action(x)?.Invoke(context)).Where(x => x is not null).ToList();
         }
